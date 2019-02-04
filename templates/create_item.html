@@ -6,7 +6,7 @@ You're logged in already!
 
 {% else %}
 
-<form action="/create_item" method="POST">
+<form action="/do_create_item" method="POST">
     <div class="create-item">
         <div class="login-screen">
             <div class="app-title">
@@ -14,16 +14,16 @@ You're logged in already!
             </div>
             <div class="login-form">
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-name" name="Name">
+                    <input type="text" class="login-field" value="" placeholder="item-name" name="name">
                     <label class="login-field-icon fui-user" for="item-name"></label></div>
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-email" name="Email address">
+                    <input type="text" class="login-field" value="" placeholder="item-email" name="emailaddress">
                     <label class="login-field-icon fui-user" for="item-email"></label></div>
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-itemname" name="Name">
+                    <input type="text" class="login-field" value="" placeholder="item-itemname" name="itemname">
                     <label class="login-field-icon fui-user" for="item-itemname"></label></div>
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-description" name="Description">
+                    <input type="text" class="login-field" value="" placeholder="item-description" name="itemdescr">
                     <label class="login-field-icon fui-user" for="login-itemdescr"></label></div>
                 <input type="submit" value="Submit" class="btn btn-primary btn-large btn-block">
             </div>

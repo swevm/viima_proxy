@@ -202,7 +202,43 @@ def create_item():
 
 @app.route('/do_create_item', methods=['POST'])
 def do_create_item():
-    pass
+    if 'oauth_token' in session:
+        token = session['oauth_token']
+    else:
+        return auth()
+
+
+    if request.form['name'] and request.form['emailaddress'] and request.form['itemname'] and request.form['itemdescr']:
+        log.debug('Creator: %s  Email: %s  Item name: %s  Item Description: %s',
+                  request.form['name'],
+                  request.form['emailaddress'],
+                  request.form['itemname'],
+                  request.form['itemdescr'])
+        try:
+            extra = {
+                'client_id': session['client_id'],
+                'client_secret': session['client_secret'],
+            }
+            post_item_data = {
+                'name': request.form['itemname'],
+                'description': 'Idea creator: ' + request.form['name'] + '\n' + 'Creator email: ' + request.form['emailaddress'] + '\n\n' + request.form['itemdescr']
+            }
+            viima_client = OAuth2Session(client_id,
+                                         token=token,
+                                         auto_refresh_kwargs=extra,
+                                         auto_refresh_url=refresh_url,
+                                         token_updater=token_updater)
+            headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+            response = viima_client.post('https://app.viima.com/api/customers/3730/items/', data=json.dumps(post_item_data), headers=headers)
+            log.debug('do_item_create() - POST response: %s', response.content)
+            #print(session)
+        except Exception as e:
+            log.error("Oauth2 error: %s ", e)
+            return redirect(url_for('auth'))
+
+    else:
+        log.debug('We should not get here!')
+    return items()
 
 
 if __name__ == "__main__":
