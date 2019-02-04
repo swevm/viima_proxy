@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+{% block body %}
+{% if session['logged_in'] %}
+
+You're logged in already!
+
+{% else %}
+
+<form action="/create_item" method="POST">
+    <div class="create-item">
+        <div class="login-screen">
+            <div class="app-title">
+                <h1>Atea AU - Create new idea or proposal</h1>
+            </div>
+            <div class="login-form">
+                <div class="control-group">
+                    <input type="text" class="login-field" value="" placeholder="item-name" name="Name">
+                    <label class="login-field-icon fui-user" for="item-name"></label></div>
+                <div class="control-group">
+                    <input type="text" class="login-field" value="" placeholder="item-email" name="Email address">
+                    <label class="login-field-icon fui-user" for="item-email"></label></div>
+                <div class="control-group">
+                    <input type="text" class="login-field" value="" placeholder="item-itemname" name="Name">
+                    <label class="login-field-icon fui-user" for="item-itemname"></label></div>
+                <div class="control-group">
+                    <input type="text" class="login-field" value="" placeholder="item-description" name="Description">
+                    <label class="login-field-icon fui-user" for="login-itemdescr"></label></div>
+                <input type="submit" value="Submit" class="btn btn-primary btn-large btn-block">
+            </div>
+        </div>
+    </div>
+</form>{% endif %}
+{% endblock %}
