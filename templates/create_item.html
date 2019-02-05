@@ -1,39 +1,24 @@
-<link rel="stylesheet" href="/static/style.css" type="text/css">
-{% block body %}
-{% if session['logged_in'] %}
+<link rel="stylesheet" href="/static/pure.css" type="text/css">
 
-You're logged in already!
+<form action="/do_create_item" method="POST" class="pure-form">
+    <fieldset class="pure-group">
+        <legend>Provide information about yourself</legend>
+        <input type="text" class="pure-input-1-2" placeholder="Enter your name" name="name">
+        <input type="email" class="pure-input-1-2" placeholder="Enter your email address" name="emailaddress">
+        <input type="text" class="pure-input-1-2" placeholder="Provide your cellphone number" name="cellphone">
+    </fieldset>
 
-{% else %}
+    <fieldset class="pure-group">
+        <legend>Minimal information needed for evaluation</legend>
+        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="itemname">
+        <textarea class="pure-input-1-2" placeholder="Provide a description about your idea" name="itemdescr"></textarea>
+    </fieldset>
 
-<form action="/do_create_item" method="POST">
-    <div class="create">
-        <div class="create-screen">
-            <div class="app-title">
-                <h1>Atea AU - Create new idea or proposal</h1>
-            </div>
-            <div class="create_item-form">
-                <div class="control-group">
-                    <input type="text" class="create_item-field" value="" placeholder="Enter your name" name="name">
-                    <label class="login-field-icon fui-user" for="item-name"></label></div>
-                <div class="control-group">
-                    <input type="text" class="create_item-field" value="" placeholder="Enter your email address" name="emailaddress">
-                    <label class="login-field-icon fui-user" for="item-email"></label></div>
-                <div class="control-group">
-                    <input type="text" class="create_item-field" value="" placeholder="Give your idea a name" name="itemname">
-                    <label class="login-field-icon fui-user" for="item-itemname"></label></div>
-                <div class="control-group">
-                    <input type="text" class="create_item-field" value="" placeholder="Provide a description about your idea" name="itemdescr">
-                    <label class="login-field-icon fui-user" for="login-itemdescr"></label></div>
-                <div class="control-group">
-                    <input type="text" class="create_item-field" value="" placeholder="What is the problem this idea solves?" name="item_problem_solved">
-                    <label class="login-field-icon fui-user" for="item-itemname"></label></div>
-                <div class="control-group">
-                    <input type="text" class="create_item-field" value="" placeholder="What results will it bring to Atea?" name="item_expected_results">
-                    <label class="login-field-icon fui-user" for="item-itemname"></label></div>
-                <input type="submit" value="Submit" class="btn btn-primary btn-large btn-block">
-            </div>
-        </div>
-    </div>
-</form>{% endif %}
-{% endblock %}
+    <fieldset class="pure-group">
+        <legend>Adding answers here increase your chances significantly</legend>
+        <textarea class="pure-input-1-2" placeholder="What is the problem this idea solves?" name="item_solves"></textarea>
+        <textarea class="pure-input-1-2" placeholder="What result will it bring?" name="item_results"></textarea>
+    </fieldset>
+    <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
+</form>
+

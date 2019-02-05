@@ -5,53 +5,66 @@ box-sizing: border-box;
 *:focus {
 outline: none;
 }
+
 body {
 font-family: Arial;
 background-color: #3498DB;
 padding: 50px;
 }
-.login {
+
+login {
 margin: 20px auto;
 width: 450px;
 }
 
-.create {
+login-screen {
+background-color: #FFF;
+padding: 20px;
+border-radius: 5px
+}
+
+login-form {
+text-align: center;
+}
+
+login-link {
+font-size: 12px;
+color: #444;
+display: block;
+margin-top: 12px;
+}
+
+create {
 margin: 20px auto;
 width: 450px;
 }
 
-.create-screen {
+create-screen {
 background-color: #FFF;
 padding: 20px;
+width: 100%;
 border-radius: 5px
 }
 
-.login-screen {
+create_item-screen {
 background-color: #FFF;
 padding: 20px;
 border-radius: 5px
+width: 600px
 }
 
-.create_item-screen {
-background-color: #FFF;
-padding: 20px;
-border-radius: 5px
-}
-
-.app-title {
+app-title {
 text-align: center;
 color: #777;
-}
-
-.login-form {
-text-align: center;
 }
 
 create_item-form {
 text-align: center;
 }
-.control-group {
+
+control-group {
 margin-bottom: 10px;
+text-align: center;
 }
 
 input {
@@ -62,7 +75,7 @@ border-radius: 3px;
 font-size: 16px;
 font-weight: 200;
 padding: 10px 0;
-width: 400px;
+width: 600px;
 transition: border .5s;
 }
 
@@ -71,7 +84,8 @@ login-field {
 }
 
 create_item-field {
-  width: 60%
+  width: 100%
+
 }
 
 input:focus {
@@ -100,10 +114,4 @@ margin: 0 auto;
 background-color: #2980B9;
 }
 
-.login-link {
-font-size: 12px;
-color: #444;
-display: block;
-margin-top: 12px;
-}
 

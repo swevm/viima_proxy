@@ -1,38 +1,21 @@
-<link rel="stylesheet" href="/static/style.css" type="text/css">
-{% block body %}
-{% if session['logged_in'] %}
+<link rel="stylesheet" href="/static/pure.css" type="text/css">
 
-You're logged in already!
 
-{% else %}
+<form action="/do_auth" method="POST" class="pure-form">
+    <fieldset class="pure-group">
+        <legend>Add your Viima Client ID and Client Secret here</legend>
+        <input type="text" class="pure-input-1-2" placeholder="Enter Client Id" name="client_id">
+        <input type="text" class="pure-input-1-2" placeholder="Enter Client Secret" name="client_secret">
+    </fieldset>
 
-<form action="/do_auth" method="POST">
-    <div class="login">
-        <div class="login-screen">
-            <div class="app-title">
-                <h1>Authorize against Viima</h1>
-            </div>
-            <div class="login-form">
+    <fieldset class="pure-group">
+        <legend>Viima username and password is required for Oauth2 token to be created</legend>
+        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="username">
+        <input type="password" class="pure-input-1-2" placeholder="Give your idea a name" name="password">
+    </fieldset>
 
-                <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="client_id" name="client_id">
-                    <label class="login-field-icon fui-user" for="login-client-id"></label></div>
+    <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
+</form>
 
-                <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="client_secret" name="client_secret">
-                    <label class="login-field-icon fui-user" for="login-client-secret"></label></div>
 
-                <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="username" name="username">
-                    <label class="login-field-icon fui-user" for="login-name"></label></div>
 
-                <div class="control-group">
-                    <input type="password" class="login-field" value="" placeholder="password" name="password">
-                    <label class="login-field-icon fui-lock" for="login-pass"></label></div>
-                <input type="submit" value="Log in" class="btn btn-primary btn-large btn-block">
-
-            </div>
-        </div>
-    </div>
-</form>{% endif %}
-{% endblock %}

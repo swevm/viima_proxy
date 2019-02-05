@@ -1,37 +1,33 @@
+<link rel="stylesheet" href="/static/pure.css" type="text/css">
 <style>
-  #viima-items {
-    border: 1px solid black;
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 80%;
+  tr:nth-child(odd):hover td {
+    background:#4E5066;
   }
-
-  #viima-items td, #viima-items th {
-    border: 1px solid black;
-    text-align: left;
-    padding: 8px;
-  }
-
-  #viima-items tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-
-  #viima-items tr:hover {
-    background-color: #ddd;
+  tr:hover td {
+    background:#4E5066;
+    color:#FFFFFF;
+    border-top: 1px solid #22262e;
   }
 </style>
-<h1>Viima ideas</h1>
-<table id="viima-items">
-        <tr>
-            {% for col in colnames %}
+
+<div>
+    <h1>List of current AU proposals</h1>
+</div>
+<table class="pure-table pure-table-striped">
+    <thead>
+    <tr>
+        {% for col in colnames %}
             <th>{{ col }}</th>
-            {% endfor %}
-        </tr>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
         {% for record in records %}
         <tr>
             {% for col in colnames %}
-            <td>{{ record[col] }}</td>
+                <td>{{ record[col] }}</td>
             {% endfor %}
         </tr>
         {% endfor %}
+    </tbody>
 </table>
