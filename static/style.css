@@ -14,7 +14,25 @@ padding: 50px;
 margin: 20px auto;
 width: 450px;
 }
+
+.create {
+margin: 20px auto;
+width: 450px;
+}
+
+.create-screen {
+background-color: #FFF;
+padding: 20px;
+border-radius: 5px
+}
+
 .login-screen {
+background-color: #FFF;
+padding: 20px;
+border-radius: 5px
+}
+
+.create_item-screen {
 background-color: #FFF;
 padding: 20px;
 border-radius: 5px
@@ -26,6 +44,10 @@ color: #777;
 }
 
 .login-form {
+text-align: center;
+}
+
+create_item-form {
 text-align: center;
 }
 .control-group {
@@ -42,6 +64,14 @@ font-weight: 200;
 padding: 10px 0;
 width: 400px;
 transition: border .5s;
+}
+
+login-field {
+  width: 60%
+}
+
+create_item-field {
+  width: 60%
 }
 
 input:focus {

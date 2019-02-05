@@ -76,7 +76,7 @@ def do_auth():
 
     else:
         log.debug('We should not get here!')
-    return items()
+    return redirect(url_for('items'))
 
 
 @app.route("/items")
@@ -239,7 +239,7 @@ def do_create_item():
 
     else:
         log.debug('We should not get here!')
-    return items()
+    return redirect(url_for('table'))
 
 
 if __name__ == "__main__":

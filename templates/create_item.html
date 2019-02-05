@@ -7,24 +7,30 @@ You're logged in already!
 {% else %}
 
 <form action="/do_create_item" method="POST">
-    <div class="create-item">
-        <div class="login-screen">
+    <div class="create">
+        <div class="create-screen">
             <div class="app-title">
                 <h1>Atea AU - Create new idea or proposal</h1>
             </div>
-            <div class="login-form">
+            <div class="create_item-form">
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-name" name="name">
+                    <input type="text" class="create_item-field" value="" placeholder="Enter your name" name="name">
                     <label class="login-field-icon fui-user" for="item-name"></label></div>
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-email" name="emailaddress">
+                    <input type="text" class="create_item-field" value="" placeholder="Enter your email address" name="emailaddress">
                     <label class="login-field-icon fui-user" for="item-email"></label></div>
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-itemname" name="itemname">
+                    <input type="text" class="create_item-field" value="" placeholder="Give your idea a name" name="itemname">
                     <label class="login-field-icon fui-user" for="item-itemname"></label></div>
                 <div class="control-group">
-                    <input type="text" class="login-field" value="" placeholder="item-description" name="itemdescr">
+                    <input type="text" class="create_item-field" value="" placeholder="Provide a description about your idea" name="itemdescr">
                     <label class="login-field-icon fui-user" for="login-itemdescr"></label></div>
+                <div class="control-group">
+                    <input type="text" class="create_item-field" value="" placeholder="What is the problem this idea solves?" name="item_problem_solved">
+                    <label class="login-field-icon fui-user" for="item-itemname"></label></div>
+                <div class="control-group">
+                    <input type="text" class="create_item-field" value="" placeholder="What results will it bring to Atea?" name="item_expected_results">
+                    <label class="login-field-icon fui-user" for="item-itemname"></label></div>
                 <input type="submit" value="Submit" class="btn btn-primary btn-large btn-block">
             </div>
         </div>
