@@ -13,7 +13,7 @@ client_secret = ""
 redirect_uri = 'https://your.registered/callback' # Not used by Viima afaik
 
 # Setup logging capabilities
-log = logging.getLogger('Flaskapp')
+log = logging.getLogger('Viima Proxy')
 log.addHandler(logging.StreamHandler(sys.stdout))
 log.setLevel(logging.DEBUG)
 logging.basicConfig(format='%(process)d-%(levelname)s-%(message)s')
@@ -40,7 +40,7 @@ def home():
 
 @app.route('/auth')
 def auth():
-    print(session)
+    log.debug('/auth() - Existing session: %s', session)
     if client_id == "" or client_secret == "" or 'oauth_token' in session:
         return render_template('auth.html')
     else:
@@ -48,14 +48,15 @@ def auth():
 
 
 def token_updater(token):
-    print('Outer token updater')
+    log.debug('Access token updated. Old = %s  New = %s', session['oauth_token']['access_token'], token['access_token'])
     session['oauth_token'] = token
 
 
 @app.route('/do_auth', methods=['POST'])
 def do_auth():
     if request.form['client_id'] and request.form['client_secret'] and request.form['username'] and request.form['password']:
-        log.debug('Entered Client Id %s', request.form['client_id'])
+        log.debug('/do_auth - Entered Client Id %s', request.form['client_id'])
+        log.debug('/do_auth - Entered Client Secret %s', request.form['client_secret'])
         try:
             viima_client = OAuth2Session(
                 client=LegacyApplicationClient(client_id=request.form['client_id']))
@@ -68,7 +69,7 @@ def do_auth():
             session['client_id'] = request.form['client_id']
             session['client_secret'] = request.form['client_secret']
             session['oauth_token'] = token
-            print(session)
+            log.debug('/do_auth - New session: %s', session)
         except Exception as e:
             log.error("Oauth2 error: %s ", e)
             return redirect(url_for('auth'))
@@ -230,8 +231,8 @@ def do_create_item():
                                          token_updater=token_updater)
             headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
             response = viima_client.post('https://app.viima.com/api/customers/3730/items/', data=json.dumps(post_item_data), headers=headers)
+            log.debug('do_item_create() - POST response statuscode: %s', response.status_code)
             log.debug('do_item_create() - POST response: %s', response.content)
-            #print(session)
         except Exception as e:
             log.error("Oauth2 error: %s ", e)
             return redirect(url_for('auth'))
