@@ -28,6 +28,14 @@ scope = [
     "write",
 ]
 
+translate_map = {
+    'name': 'Name of idea',
+    'fullname': 'Creator',
+    'hotness': 'hotness',
+    'vote_count': 'vote count',
+    'viima_score': 'AU Points',
+    'au_status': 'In AU process stage',
+}
 
 @app.route('/')
 def home():
@@ -130,6 +138,7 @@ def table():
     labels = []
     rows = []
     rowdata = []
+    friendlylabels = []
 
     if 'oauth_token' in session:
         token = session['oauth_token']
@@ -172,20 +181,23 @@ def table():
             response_items.append(response_item)
             response_item = {}
 
-        # Create Table column names in separate list
-        for row in response_items:
+        # Create list with raw(API JSON) column names from response
+        for row in response_items: # Only loop into first level
             for col in row.keys():
                 labels.append(col)
             break
-        for row in response_items:
-            for value in row.values():
-                rowdata.append(value)
-            rows.append(rowdata)
-            rowdata = []
+
+        # Create friendly Table column names in separate list to be used in Table representation of ideas
+        for row in response_items: # Only loop into first level
+            for col in row.keys():
+                for friendlydescr in translate_map.keys():
+                    if col == friendlydescr:
+                        friendlylabels.append(translate_map[friendlydescr])
+            break # Break - So that we only extract column names once. There must be better ways to do this?
     else:
         return auth()
 
-    return render_template('table.html', records=response_items, colnames=labels)
+    return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
 
 
 @app.route('/create_item')
