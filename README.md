@@ -8,5 +8,5 @@ How to run:
 - pip3 install -r requirements.txt
 
 Two ways to run:
-- For simple testing "python3 run.py" start app on port 4000
+- For simple testing "python3 run.py" start app on port 4000 (with Flask in debug mode)
 - For a more scalable deployment do "gunicorn --bind 0.0.0.0:4000 wsgi:app"
