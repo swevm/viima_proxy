@@ -1,13 +1,12 @@
-from flask import Flask, flash, request, url_for, redirect, render_template, request, session, abort, Response
-import os
+from flask import Flask, flash, request, Blueprint, url_for, redirect, render_template, request, session, abort, Response
 from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 import json
 import logging
 import sys
 
-app = Flask(__name__)
 
+# Move configuration parameters to factory - Add a config.py and import from app.config.from_mapping()???
 client_id = ""
 client_secret = ""
 redirect_uri = 'https://your.registered/callback' # Not used by Viima afaik
@@ -37,7 +36,10 @@ translate_map = {
     'au_status': 'In AU process stage',
 }
 
-@app.route('/')
+proxyapp = Blueprint('proxyapp', __name__)
+
+
+@proxyapp.route('/')
 def home():
     # Show connection status. Should do a basic API call to make sure we´re connected. If not redirect to /auth
     if client_id == "" or client_secret == "":
@@ -46,7 +48,7 @@ def home():
         return json.dumps(session)
 
 
-@app.route('/auth')
+@proxyapp.route('/auth')
 def auth():
     log.debug('/auth() - Existing session: %s', session)
     if client_id == "" or client_secret == "" or 'oauth_token' in session:
@@ -60,7 +62,7 @@ def token_updater(token):
     session['oauth_token'] = token
 
 
-@app.route('/do_auth', methods=['POST'])
+@proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
     if request.form['client_id'] and request.form['client_secret'] and request.form['username'] and request.form['password']:
         log.debug('/do_auth - Entered Client Id %s', request.form['client_id'])
@@ -84,10 +86,10 @@ def do_auth():
 
     else:
         log.debug('We should not get here!')
-    return redirect(url_for('items'))
+    return redirect(url_for('proxyapp.items'))
 
 
-@app.route("/items")
+@proxyapp.route("/items")
 def items():
 
     if 'oauth_token' in session:
@@ -133,7 +135,7 @@ def items():
     return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
 
 
-@app.route("/table")
+@proxyapp.route("/table")
 def table():
     labels = []
     rows = []
@@ -200,7 +202,7 @@ def table():
     return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
 
 
-@app.route('/create_item')
+@proxyapp.route('/create_item')
 def create_item():
     if 'oauth_token' in session:
         token = session['oauth_token']
@@ -213,13 +215,12 @@ def create_item():
         return render_template('auth.html')
 
 
-@app.route('/do_create_item', methods=['POST'])
+@proxyapp.route('/do_create_item', methods=['POST'])
 def do_create_item():
     if 'oauth_token' in session:
         token = session['oauth_token']
     else:
         return auth()
-
 
     if request.form['name'] and request.form['emailaddress'] and request.form['itemname'] and request.form['itemdescr']:
         log.debug('Creator: %s  Email: %s  Item name: %s  Item Description: %s',
@@ -251,10 +252,4 @@ def do_create_item():
 
     else:
         log.debug('We should not get here!')
-    return redirect(url_for('table'))
-
-
-if __name__ == "__main__":
-    app.secret_key = os.urandom(12)
-
-app.run(debug=True, host='0.0.0.0', port=4000)
+    return redirect(url_for('proxyapp.table'))
