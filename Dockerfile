@@ -11,9 +11,11 @@ RUN pip install -r requirements.txt
 #RUN venv/bin/pip install -r requirements.txt
 #RUN venv/bin/pip install gunicorn
 
+COPY cert/* ./
+
 RUN chmod +x ./boot.sh
 
 RUN chown -R root:root ./
 
 EXPOSE 4000
-ENTRYPOINT ["./boot.sh"]
+ENTRYPOINT ["./boot.sh", "localhost.key", "localhost.crt"]
