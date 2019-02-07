@@ -14,6 +14,6 @@ Two ways to run (from shell):
 Run with Docker
 - Clone repo
 - mkdir /cert
-- Create openssl cert, named localhost.key and localhost.crt
+- Create openssl cert inside /cert, name them localhost.key and localhost.crt
 - docker image -t viima-proxy .
 - docker run -p 4000:4000 viima-proxy
