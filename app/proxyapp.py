@@ -33,7 +33,7 @@ translate_map = {
     'hotness': 'hotness',
     'vote_count': 'vote count',
     'viima_score': 'AU Points',
-    'au_status': 'In AU process stage',
+    'au_status': 'Process stage',
 }
 
 proxyapp = Blueprint('proxyapp', __name__)
@@ -173,20 +173,23 @@ def table():
         for local_item in items_dict['results']:
             response_item['name'] = local_item['name']
             response_item['fullname'] = local_item['fullname']
-            response_item['hotness'] = local_item['hotness']
+            response_item['hotness'] = round(float(local_item['hotness']), 1)
             response_item['vote_count'] = local_item['vote_count']
             response_item['viima_score'] = local_item['viima_score']
             for status in statuses:
-                if local_item['status'] == status['id']:
+                if status['id'] == local_item['status']:
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
+            log.debug('Response item(local): %s', response_item)
             response_item = {}
 
         # Create list with raw(API JSON) column names from response
         for row in response_items: # Only loop into first level
+            log.debug('Row: %s', row)
             for col in row.keys():
                 labels.append(col)
+                log.debug('Key: %s', col)
             break
 
         # Create friendly Table column names in separate list to be used in Table representation of ideas
@@ -240,16 +243,56 @@ def do_create_item():
             viima_client = OAuth2Session(client_id,
                                          token=token,
                                          auto_refresh_kwargs=extra,
-                                         auto_refresh_url=refresh_url,
+                                         #auto_refresh_url=refresh_url,
                                          token_updater=token_updater)
             headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
-            response = viima_client.post('https://app.viima.com/api/customers/3730/items/', data=json.dumps(post_item_data), headers=headers)
-            log.debug('do_item_create() - POST response statuscode: %s', response.status_code)
-            log.debug('do_item_create() - POST response: %s', response.content)
+            response = viima_client.post('https://app.viima.com/api/customers/3730/items/',
+                                         data=json.dumps(post_item_data),
+                                         headers=headers)
+            log.debug('do_item_create(add idea) - POST response statuscode: %s', response.status_code)
+            log.debug('do_item_create(add idea) - POST response: %s', response.json())
+            response_content_json = response.json()
+
+            # ADD CUSTOM FIELD DATA FROM FORMs to Viima:
+            # POST custom fields data from form - "What is the problem this idea solves?"
+            post_item_customfields_data = {
+                'custom_field': "102",
+                'value': request.form['item_solves']}
+            item_id_customfield = response_content_json['id']
+            log.debug('https://app.viima.com/api/customers/3730/items/' + str(item_id_customfield) + '/custom_field_values/')
+            log.debug(post_item_customfields_data)
+            response = viima_client.post('https://app.viima.com/api/customers/3730/items/'
+                                         + str(item_id_customfield) + '/custom_field_values/',
+                                         data=json.dumps(post_item_customfields_data),
+                                         headers=headers)
+            log.debug('do_item_create(add custom) - POST response statuscode: %s', response.status_code)
+            log.debug('do_item_create(add custom) - POST response: %s', response.json())
+            # Handle this response
+            response_content_json = response.json()
+
+
+            # POST custom fields data from form - "What result will it bring?"
+            post_item_customfields_data = {
+                'custom_field': "103",
+                'value': request.form['item_results']}
+            #item_id_customfield = response_content_json['id']
+            response = viima_client.post('https://app.viima.com/api/customers/3730/items/'
+                                         + str(item_id_customfield) + '/custom_field_values/',
+                                         data=json.dumps(post_item_customfields_data),
+                                         headers=headers)
+            log.debug(post_item_customfields_data)
+            log.debug('do_item_create(add custom) - POST response statuscode: %s', response.status_code)
+            log.debug('do_item_create(add custom) - POST response: %s', response.json())
+            # Handle this response
+            response_content_json = response.json()
+
         except Exception as e:
             log.error("Oauth2 error: %s ", e)
-            return redirect(url_for('auth'))
+            #raise
+            return redirect(url_for('proxyapp.auth'))
 
     else:
         log.debug('We should not get here!')
+        # We should redirect to a thank you page and then back to create_item_form
+        # - May just a simple popup and then back to form
     return redirect(url_for('proxyapp.table'))
