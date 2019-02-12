@@ -1,15 +1,15 @@
 from flask import Flask, flash, request, Blueprint, url_for, redirect, render_template, request, session, abort, Response
-from oauthlib.oauth2 import LegacyApplicationClient
+#from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 import json
 import logging
 import sys
+from app.Viimawrapper.viimawrapper import Viimawrapper
 
 
 # Move configuration parameters to factory - Add a config.py and import from app.config.from_mapping()???
 client_id = ""
 client_secret = ""
-redirect_uri = 'https://your.registered/callback' # Not used by Viima afaik
 
 # Setup logging capabilities
 log = logging.getLogger('Viima Proxy')
@@ -19,13 +19,17 @@ logging.basicConfig(format='%(process)d-%(levelname)s-%(message)s')
 
 # OAuth2 given in the Viima API documentation
 authorization_base_url = "https://app.viima.com/oauth2/token/"
-api_base_url = "app.viima.com/api/customers/3730/" # 3730 correspond to specific Viima Board ID
-token_url = "https://app.viima.com/oauth2/token/" # Not really used by Viima but act as base API URL
-refresh_url = "https://app.viima.com/oauth2/token/" # This one is used for Viima Oauth2 token refresh
+api_base_url = "app.viima.com/api/customers/3730/"  # 3730 correspond to specific Viima Board ID
+customer_id = 3730
+token_url = "https://app.viima.com/oauth2/token/"  # Not really used by Viima but act as base API URL
+refresh_url = "https://app.viima.com/oauth2/token/"  # This one is used for Viima Oauth2 token refresh
 scope = [
     "read",
     "write",
 ]
+
+# Required variables for Viima wrapper
+appclient = Viimawrapper(customer_id, authorization_base_url, api_base_url)
 
 translate_map = {
     'name': 'Name of idea',
@@ -42,80 +46,50 @@ proxyapp = Blueprint('proxyapp', __name__)
 @proxyapp.route('/')
 def home():
     # Show connection status. Should do a basic API call to make sure we´re connected. If not redirect to /auth
-    if client_id == "" or client_secret == "":
-        return render_template('auth.html')
+    if appclient.isconnected():
+        return redirect(url_for('proxyapp.items'))
     else:
-        return json.dumps(session)
+        return redirect(url_for('proxyapp.auth'))
 
 
 @proxyapp.route('/auth')
 def auth():
-    log.debug('/auth() - Existing session: %s', session)
-    if client_id == "" or client_secret == "" or 'oauth_token' in session:
-        return render_template('auth.html')
-    else:
+    if appclient.isconnected():
         return 'Connected to Viima API!  <a href=" /logout">Logout</a>'
+    else:
+        return render_template('auth.html')
 
-
-def token_updater(token):
-    log.debug('Access token updated. Old = %s  New = %s', session['oauth_token']['access_token'], token['access_token'])
-    session['oauth_token'] = token
+#def token_updater(token):
+#    log.debug('Access token updated. Old = %s  New = %s', session['oauth_token']['access_token'], token['access_token'])
+#    session['oauth_token'] = token
 
 
 @proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
-    if request.form['client_id'] and request.form['client_secret'] and request.form['username'] and request.form['password']:
-        log.debug('/do_auth - Entered Client Id %s', request.form['client_id'])
-        log.debug('/do_auth - Entered Client Secret %s', request.form['client_secret'])
-        try:
-            viima_client = OAuth2Session(
-                client=LegacyApplicationClient(client_id=request.form['client_id']))
-            token = viima_client.fetch_token(
-                token_url=token_url,
-                username=request.form['username'],
-                password=request.form['password'],
-                client_id=request.form['client_id'],
-                client_secret=request.form['client_secret'])
-            session['client_id'] = request.form['client_id']
-            session['client_secret'] = request.form['client_secret']
-            session['oauth_token'] = token
-            log.debug('/do_auth - New session: %s', session)
-        except Exception as e:
-            log.error("Oauth2 error: %s ", e)
-            return redirect(url_for('auth'))
-
-    else:
-        log.debug('We should not get here!')
+    #if request.form['client_id'] and \
+    #        request.form['client_secret'] \
+    #        and request.form['username'] \
+    #        and request.form['password']:
+    #    log.debug('/do_auth - Entered Client Id %s', request.form['client_id'])
+    #    log.debug('/do_auth - Entered Client Secret %s', request.form['client_secret'])
+    appclient.login(request.form['username'],
+                    request.form['password'],
+                    request.form['client_id'],
+                    request.form['client_secret'],
+                    scope=scope)
     return redirect(url_for('proxyapp.items'))
 
 
 @proxyapp.route("/items")
 def items():
-
-    if 'oauth_token' in session:
-        token = session['oauth_token']
-    else:
-        return auth()
-
-    if 'client_id' in session or 'client_secret' in session or 'access_token' in token:
-        extra = {
-            'client_id': session['client_id'],
-            'client_secret': session['client_secret'],
-        }
-        viima_client = OAuth2Session(client_id,
-                                     token=token,
-                                     auto_refresh_kwargs=extra,
-                                     auto_refresh_url=refresh_url,
-                                     token_updater=token_updater)
-
-    # Not efficient doing these API calls for every call to /items
-        items_dict = viima_client.get('https://app.viima.com/api/customers/3730/items/').json()
-        statuses = viima_client.get('https://app.viima.com/api/customers/3730/statuses/').json()
+    if appclient.isconnected():
+        items = appclient.getitems()
+        statuses = appclient.getstatuses()
         response_item = {}
         response_items = []
 
-    # Loop through items response. Ideas are stored in "[results]"
-        for local_item in items_dict['results']:
+        # Loop through items response. Ideas are stored in "[results]"
+        for local_item in items['results']:
             # log.debug('Extracted idea item: %s', local_item)
             response_item['name'] = local_item['name']
             response_item['fullname'] = local_item['fullname']
@@ -128,40 +102,20 @@ def items():
                     break
             response_items.append(response_item)
             response_item = {}
-
+        return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
-        return auth()
-
-    return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
-
+        return redirect(url_for('proxyapp.auth'))
 
 @proxyapp.route("/table")
 def table():
-    labels = []
-    rows = []
-    rowdata = []
-    friendlylabels = []
+    if appclient.isconnected():
+        labels = []
+        rows = []
+        rowdata = []
+        friendlylabels = []
 
-    if 'oauth_token' in session:
-        token = session['oauth_token']
-    else:
-        return auth()
-
-    # Show connection status. Should do a basic API call to make sure we´re connected. If not redirect to /auth
-    if 'client_id' in session or 'client_secret' in session or 'access_token' in token:
-        extra = {
-            'client_id': session['client_id'],
-            'client_secret': session['client_secret'],
-        }
-        viima_client = OAuth2Session(client_id,
-                                     token=token,
-                                     auto_refresh_kwargs=extra,
-                                     auto_refresh_url=refresh_url,
-                                     token_updater=token_updater)
-
-        # Not efficient doing these API calls for every call to /table
-        items_dict = viima_client.get('https://app.viima.com/api/customers/3730/items/').json()
-        statuses = viima_client.get('https://app.viima.com/api/customers/3730/statuses/').json()
+        items = appclient.getitems()
+        statuses = appclient.getstatuses()
         response_item = {}
         response_items = []
         # Loop through items response. Ideas are stored in "[results]"
@@ -170,7 +124,7 @@ def table():
         # Break out data extraction into separate function
         # Add Viima_score, hotness and other valuable data
         #
-        for local_item in items_dict['results']:
+        for local_item in items['results']:
             response_item['name'] = local_item['name']
             response_item['fullname'] = local_item['fullname']
             response_item['hotness'] = round(float(local_item['hotness']), 1)
@@ -185,7 +139,7 @@ def table():
             response_item = {}
 
         # Create list with raw(API JSON) column names from response
-        for row in response_items: # Only loop into first level
+        for row in response_items:  # Only loop into first level
             log.debug('Row: %s', row)
             for col in row.keys():
                 labels.append(col)
@@ -193,29 +147,24 @@ def table():
             break
 
         # Create friendly Table column names in separate list to be used in Table representation of ideas
-        for row in response_items: # Only loop into first level
+        for row in response_items:  # Only loop into first level
             for col in row.keys():
                 for friendlydescr in translate_map.keys():
                     if col == friendlydescr:
                         friendlylabels.append(translate_map[friendlydescr])
-            break # Break - So that we only extract column names once. There must be better ways to do this?
-    else:
-        return auth()
+            break  # Break - So that we only extract column names once. There must be better ways to do this?
 
-    return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
+        return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
+    else:
+        return redirect(url_for('proxyapp.auth'))
 
 
 @proxyapp.route('/create_item')
 def create_item():
-    if 'oauth_token' in session:
-        token = session['oauth_token']
-    else:
-        return auth()
-
-    if 'client_id' in session or 'client_secret' in session or 'access_token' in token:
+    if appclient.isconnected():
         return render_template('create_item.html')
     else:
-        return render_template('auth.html')
+        return redirect(url_for('proxyapp.auth'))
 
 
 @proxyapp.route('/do_create_item', methods=['POST'])
