@@ -20,7 +20,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
         login(username, password)
             Login to Viima API - Requires __init__() parameters to exist to work
         """
-    #def __init__(self, client_id="", client_secret="", base_authorization_url="", base_api_url="", **kwargs):
+
     def __init__(self, customer_id, base_authorization_url="", base_api_url="", **kwargs):
         """
                 Parameters
@@ -39,30 +39,23 @@ class Viimawrapper: # I wonder if this inheritance will work??
                     Contains a list of strings can be either 'read' 'write' or both in a list
                 HOW TO DOCUMENT KWARGS???
         """
-        self.client_id = ''  #client_id
-        self.client_secret = ''  #client_secret
+        self.client_id = ''  # Default to empty
+        self.client_secret = ''  # Default to empty
         self.base_authorization_url = base_authorization_url
-        self.base_api_url = base_api_url
-        self.customer_id = str(customer_id)  # Default value for board ID - This is unique per Viima board and is not really a customer per definition
-        self.scope = ['read']  # Default to readonly API access
-        self.authorization_url = base_authorization_url
-
-        #for key, value in kwargs.items():
-        #    if key == 'customer_id':
-        #        self.customer_id = value
-        #    if key == 'scope':
-        #        self.scope = value
-
-        self.token = {} # Default to empty token dict
-        self.client = None # Holds teh actual client object used to access backend API (with token refresh capability)
-        self.extras = {'client_id': self.client_id, 'client_secret': self.client_secret} # Default used for Oauth2 token session handling
+        self.base_api_url = base_api_url  # Set base URL for API endpoint
+        self.customer_id = str(customer_id)  # For board ID - This is unique per Viima board and is not really a customer per definition
+        self.scope = ['read']  # Default to readonly API access unless scope set during login()
+        self.authorization_url = base_authorization_url  # Set Oauth2 authentication URL
+        self.token = {}  # Default to empty token dict
+        self.client = None  # Holds teh actual client object used to access backend API (with token refresh capability)
+        self.extras = {'client_id': self.client_id, 'client_secret': self.client_secret}  # Used for Oauth2 token session handling
 
         # Create Oauth2Session - perhaps have these utility functions in a separate method instead of __init__
         # I wondr if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
         self.viimaAppClient = None
 
-        self.api_connection_state = False # True if class har working connection to Viima API
-        self.logger = logging.getLogger('Viima Proxy')
+        self.api_connection_state = False  # True if class har working connection to Viima API
+        self.logger = logging.getLogger('Viima Proxy')  # Get degined logging facility
 
     def connect(self, username, password):
         pass
@@ -76,9 +69,9 @@ class Viimawrapper: # I wonder if this inheritance will work??
         return self.api_connection_state
 
     def token_updater(self, token):
-        #log.debug('Access token updated. Old = %s  New = %s', session['oauth_token']['access_token'],
-        #          token['access_token'])
+        self.logger.debug('Access token updated. Old = %s ', self.token['access_token'])
         self.token = token
+        self.logger.debug('Access token updated. New = %s ', self.token['access_token'])
 
     def refresh(self): # Method refreshes cached data, such as Categories, Statuses, Items(think about if its worth caching this data????)
         pass
@@ -109,6 +102,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             print("Login token:  %s", self.token)
         except Exception as e:
             print("Exception in login: %s", e)
+            self.logger.error('Login() error: %s', e)
             self.api_connection_state = False
             return -1
         # Validate that token contain, access_token, refresh_token
@@ -135,6 +129,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             items = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/items/').json()
         except Exception as e:
             print(e)
+            self.logger.error('getitems() error: %s', e)
             self.api_connection_state = False
             return -1
         return items
@@ -159,6 +154,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             statuses = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/statuses/').json()
         except Exception as e:
             print(e)
+            self.logger.error('getitems_flattened() error: %s', e)
             self.api_connection_state = False
             return -1
 
@@ -187,13 +183,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Get JSON of specific Viima Idea
             item = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/items/' + str(item_id)).json()
         except Exception as e:
             print(e)
+            self.logger.error('getitem() error: %s', e)
             self.api_connection_state = False
             return -1
         return item
@@ -216,13 +212,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Get JSON of Viima statuses
             statuses = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/statuses/').json()
         except Exception as e:
             print(e)
+            self.logger.error('getstatuses() error: %s', e)
             self.api_connection_state = False
             return -1
         return statuses
@@ -232,13 +228,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Get JSON of Viima categories
             categories = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/categories/').json()
         except Exception as e:
             print(e)
+            self.logger.error('getcategories() error: %s', e)
             self.api_connection_state = False
             return -1
         return categories
@@ -250,13 +246,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Get JSON of Viima leaderboards
             leaderboards = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/leaderboards/?sort_key=' + local_sort_key).json()
         except Exception as e:
             print(e)
+            self.logger.error('leaderboards() error: %s', e)
             self.api_connection_state = False
             return -1
         return leaderboards
@@ -267,12 +263,12 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
             # Do a HTTP GET using Oauth2 access_token with same flexibility as requests_oauthlib GET emthod
             response = self.client.get(url, **kwargs)
         except Exception as e:
             print(e)
+            self.logger.error('get() error: %s', e)
             self.api_connection_state = False
             return -1
         return response
@@ -282,13 +278,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Do a HTTP GET using Oauth2 access_token with same flexibility as requests_oauthlib GET emthod
             response = self.client.post(url, data, json, **kwargs)
         except Exception as e:
             print(e)
+            self.logger.error('post() error: %s', e)
             self.api_connection_state = False
             return -1
         return response
@@ -298,13 +294,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Do a HTTP GET using Oauth2 access_token with same flexibility as requests_oauthlib GET emthod
             response = self.client.delete(url, **kwargs)
         except Exception as e:
             print(e)
+            self.logger.error('delete() error: %s', e)
             self.api_connection_state = False
             return -1
         return response
@@ -314,13 +310,13 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             # Do a HTTP GET using Oauth2 access_token with same flexibility as requests_oauthlib GET emthod
             response = self.client.put(url, data, **kwargs)
         except Exception as e:
             print(e)
+            self.logger.error('put() error: %s', e)
             self.api_connection_state = False
             return -1
         return response
