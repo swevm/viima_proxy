@@ -324,7 +324,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
                                         token_updater=self.token_updater)
 
             # Get JSON of Viima leaderboards
-            leaderboards = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/leaderboards/?sort_key=' + local_sort_key).json()
+            leaderboards = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/public_user_profiles/?sort_key=' + local_sort_key).json()
         except Exception as e:
             print(e)
             self.logger.error('leaderboards() error: %s', e)
