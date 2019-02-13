@@ -193,8 +193,72 @@ class Viimawrapper: # I wonder if this inheritance will work??
             return -1
         return item
 
-    def createitem(self):
-        pass
+    def createitem(self, name, emailaddress, itemname, itemdescr, **kwargs):
+        self.logger.debug('Creator: %s  Email: %s  Item name: %s  Item Description: %s  kwargs %s',
+                          name,
+                          emailaddress,
+                          itemname,
+                          itemdescr,
+                          kwargs)
+        try:
+            item_data = {
+                'name': itemname,
+                'status': str(16911),  # This need to configurable asd it relate fo board 3730´s specific status config
+                'description': 'Idea creator: ' + name + '\n' + 'Creator email: ' + emailaddress + '\n\n' + itemdescr}
+            headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+
+            self.client = OAuth2Session(self.client_id,
+                                        token=self.token,
+                                        auto_refresh_kwargs=self.extras,
+                                        token_updater=self.token_updater)
+
+            response = self.client.post('https://app.viima.com/api/customers/' + self.customer_id + '/items/',
+                                        data=json.dumps(item_data),
+                                        headers=headers)
+
+            self.logger.debug('do_item_create(add idea) - POST response status code: %s', response.status_code)
+            self.logger.debug('do_item_create(add idea) - POST response: %s', response.json())
+            response_content_json = response.json()
+
+            # ADD CUSTOM FIELD DATA FROM FORMs to Viima:
+            for key, value in kwargs.items():
+                if key == 'itemsolves':
+                    # POST custom fields data from form - "What is the problem this idea solves?"
+                    item_customfields_data = {'custom_field': "102", 'value': value}
+                    item_id_customfield = response_content_json['id']
+                    self.logger.debug(
+                        'ITEMSOLVES: https://app.viima.com/api/customers/' + self.customer_id + '/items/' + str(item_id_customfield) + '/custom_field_values/')
+                    self.logger.debug('Custom field data: %s  Id=%s', item_customfields_data, item_id_customfield)
+                    response = self.client.post('https://app.viima.com/api/customers/' + self.customer_id + '/items/' +
+                                                str(item_id_customfield) + '/custom_field_values/',
+                                                data=json.dumps(item_customfields_data),
+                                                headers=headers)
+                    self.logger.debug('do_item_create(add custom) - POST response status code: %s', response.status_code)
+                    self.logger.debug('do_item_create(add custom) - POST response: %s', response.json())
+                    # Handle this response
+                    #response_content_json = response.json()
+                if key == 'itemresults':
+                    # POST custom fields data from form - "What result will it bring?"
+                    item_customfields_data = {'custom_field': "103", 'value': value}
+                    self.logger.debug(
+                        'ITEMRESULTS: https://app.viima.com/api/customers/' + self.customer_id + '/items/' + str(
+                            item_id_customfield) + '/custom_field_values/')
+                    item_id_customfield = response_content_json['id']
+                    self.logger.debug('Custom field data: %s  Id=%s', item_customfields_data, item_id_customfield)
+                    response = self.client.post('https://app.viima.com/api/customers/' + self.customer_id + '/items/' +
+                                                str(item_id_customfield) + '/custom_field_values/',
+                                                data=json.dumps(item_customfields_data),
+                                                headers=headers)
+                    self.logger.debug(item_customfields_data)
+                    self.logger.debug('do_item_create(add custom) - POST response status code: %s', response.status_code)
+                    self.logger.debug('do_item_create(add custom) - POST response: %s', response.json())
+                    # Handle this response
+                    #response_content_json = response.json()
+        except Exception as e:
+            self.logger.error("Oauth2 error: %s ", e)
+            # raise
+            return -1
+        return 1
 
     def createstatus(self):
         pass
@@ -203,8 +267,20 @@ class Viimawrapper: # I wonder if this inheritance will work??
         pass
 
     def getcustomfields(self):
-        pass
-        # return a list of name tied to a unique id used in createitem to populate  custom_fields
+        try:
+            self.client = OAuth2Session(self.client_id,
+                                        token=self.token,
+                                        auto_refresh_kwargs=self.extras,
+                                        token_updater=self.token_updater)
+
+            # Get JSON of Viima statuses
+            custom_fields = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/custom_fields/').json()
+        except Exception as e:
+            print(e)
+            self.logger.error('getcustomfields() error: %s', e)
+            self.api_connection_state = False
+            return -1
+        return custom_fields
 
     def getstatuses(self):
         try:
