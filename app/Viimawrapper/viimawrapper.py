@@ -4,7 +4,7 @@ import json
 import logging
 
 
-class Viimawrapper: # I wonder if this inheritance will work??
+class Viimawrapper:
     """
         Viimawrapper class is a CRUD wrapper for public Viima REST API that wrap the basic api features in Python methods
 
@@ -69,9 +69,9 @@ class Viimawrapper: # I wonder if this inheritance will work??
         return self.api_connection_state
 
     def token_updater(self, token):
-        self.logger.debug('Access token updated. Old = %s ', self.token['access_token'])
+        self.logger.debug('Access token updated. Old = {} '.format(self.token['access_token']))
         self.token = token
-        self.logger.debug('Access token updated. New = %s ', self.token['access_token'])
+        self.logger.debug('Access token updated. New = {} '.format(self.token['access_token']))
 
     def refresh(self): # Method refreshes cached data, such as Categories, Statuses, Items(think about if its worth caching this data????)
         pass
@@ -129,7 +129,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             items = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/items/').json()
         except Exception as e:
             print(e)
-            self.logger.error('getitems() error: %s', e)
+            self.logger.error('getitems() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return items
@@ -153,7 +153,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             statuses = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/statuses/').json()
         except Exception as e:
             print(e)
-            self.logger.error('getitems_flattened() error: %s', e)
+            self.logger.error('getitems_flattened() error: {}'.format(e))
             self.api_connection_state = False
             return -1
 
@@ -188,7 +188,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             item = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/items/' + str(item_id)).json()
         except Exception as e:
             print(e)
-            self.logger.error('getitem() error: %s', e)
+            self.logger.error('getitem() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return item
@@ -216,8 +216,8 @@ class Viimawrapper: # I wonder if this inheritance will work??
                                         data=json.dumps(item_data),
                                         headers=headers)
 
-            self.logger.debug('do_item_create(add idea) - POST response status code: %s', response.status_code)
-            self.logger.debug('do_item_create(add idea) - POST response: %s', response.json())
+            self.logger.debug('do_item_create(add idea) - POST response status code: {}'.format(response.status_code))
+            self.logger.debug('do_item_create(add idea) - POST response: {}'.format(response.json()))
             response_content_json = response.json()
 
             # ADD CUSTOM FIELD DATA FROM FORMs to Viima:
@@ -228,12 +228,12 @@ class Viimawrapper: # I wonder if this inheritance will work??
                     item_id_customfield = response_content_json['id']
                     self.logger.debug(
                         'ITEMSOLVES: https://app.viima.com/api/customers/' + self.customer_id + '/items/' + str(item_id_customfield) + '/custom_field_values/')
-                    self.logger.debug('Custom field data: %s  Id=%s', item_customfields_data, item_id_customfield)
+                    self.logger.debug('Custom field data: {}  Id={}'.format(item_customfields_data, item_id_customfield))
                     response = self.client.post('https://app.viima.com/api/customers/' + self.customer_id + '/items/' +
                                                 str(item_id_customfield) + '/custom_field_values/',
                                                 data=json.dumps(item_customfields_data),
                                                 headers=headers)
-                    self.logger.debug('do_item_create(add custom) - POST response status code: %s', response.status_code)
+                    self.logger.debug('do_item_create(add custom) - POST response status code: {}'.format(response.status_code))
                     self.logger.debug('do_item_create(add custom) - POST response: %s', response.json())
                     # Handle this response
                     #response_content_json = response.json()
@@ -244,18 +244,18 @@ class Viimawrapper: # I wonder if this inheritance will work??
                         'ITEMRESULTS: https://app.viima.com/api/customers/' + self.customer_id + '/items/' + str(
                             item_id_customfield) + '/custom_field_values/')
                     item_id_customfield = response_content_json['id']
-                    self.logger.debug('Custom field data: %s  Id=%s', item_customfields_data, item_id_customfield)
+                    self.logger.debug('Custom field data: {}  Id={}'.format(item_customfields_data, item_id_customfield))
                     response = self.client.post('https://app.viima.com/api/customers/' + self.customer_id + '/items/' +
                                                 str(item_id_customfield) + '/custom_field_values/',
                                                 data=json.dumps(item_customfields_data),
                                                 headers=headers)
                     self.logger.debug(item_customfields_data)
-                    self.logger.debug('do_item_create(add custom) - POST response status code: %s', response.status_code)
-                    self.logger.debug('do_item_create(add custom) - POST response: %s', response.json())
+                    self.logger.debug('do_item_create(add custom) - POST response status code: {}'.format(response.status_code))
+                    self.logger.debug('do_item_create(add custom) - POST response: {}'.format(response.json()))
                     # Handle this response
                     #response_content_json = response.json()
         except Exception as e:
-            self.logger.error("Oauth2 error: %s ", e)
+            self.logger.error("Oauth2 error:  {}".format(e))
             # raise
             return -1
         return 1
@@ -277,7 +277,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             custom_fields = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/custom_fields/').json()
         except Exception as e:
             print(e)
-            self.logger.error('getcustomfields() error: %s', e)
+            self.logger.error('getcustomfields() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return custom_fields
@@ -293,7 +293,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             statuses = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/statuses/').json()
         except Exception as e:
             print(e)
-            self.logger.error('getstatuses() error: %s', e)
+            self.logger.error('getstatuses() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return statuses
@@ -309,7 +309,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             categories = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/categories/').json()
         except Exception as e:
             print(e)
-            self.logger.error('getcategories() error: %s', e)
+            self.logger.error('getcategories() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return categories
@@ -327,7 +327,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             leaderboards = self.client.get('https://app.viima.com/api/customers/' + self.customer_id + '/public_user_profiles/?sort_key=' + local_sort_key).json()
         except Exception as e:
             print(e)
-            self.logger.error('leaderboards() error: %s', e)
+            self.logger.error('leaderboards() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return leaderboards
@@ -343,7 +343,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             response = self.client.get(url, **kwargs)
         except Exception as e:
             print(e)
-            self.logger.error('get() error: %s', e)
+            self.logger.error('get() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return response
@@ -359,7 +359,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             response = self.client.post(url, data, json, **kwargs)
         except Exception as e:
             print(e)
-            self.logger.error('post() error: %s', e)
+            self.logger.error('post() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return response
@@ -375,7 +375,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             response = self.client.delete(url, **kwargs)
         except Exception as e:
             print(e)
-            self.logger.error('delete() error: %s', e)
+            self.logger.error('delete() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return response
@@ -391,7 +391,7 @@ class Viimawrapper: # I wonder if this inheritance will work??
             response = self.client.put(url, data, **kwargs)
         except Exception as e:
             print(e)
-            self.logger.error('put() error: %s', e)
+            self.logger.error('put() error: {}'.format(e))
             self.api_connection_state = False
             return -1
         return response

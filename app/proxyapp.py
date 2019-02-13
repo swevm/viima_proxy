@@ -128,7 +128,7 @@ def table():
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
-            log.debug('Response item(local): %s', response_item)
+            log.debug('Response item(local): {}'.format(response_item))
             response_item = {}
 
         # Create list with raw(API JSON) column names from response
