@@ -1,0 +1,17 @@
+<link rel="stylesheet" href="/static/pure.css" type="text/css">
+<style>
+  tr:nth-child(odd):hover td {
+    background:#4E5066;
+  }
+  tr:hover td {
+    background:#4E5066;
+    color:#FFFFFF;
+    border-top: 1px solid #22262e;
+  }
+</style>
+
+{% if is_connected  %}
+<h2>Connected to backend APIs</h2>
+{% else %}
+<h2>Not connected to backend APIs. Try again later</h2>
+{% endif %}

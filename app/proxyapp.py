@@ -52,16 +52,20 @@ def home():
         return redirect(url_for('proxyapp.auth'))
 
 
+@proxyapp.route('/status')
+def status():
+    # Show connection status for backend API
+    if appclient.isconnected():
+        return render_template('status.html', is_connected=appclient.isconnected()) #redirect(url_for('proxyapp.items'))  # Add dynamic data to status to show that connecvtion is live or down.
+    else:
+        return render_template('status.html', is_connected=appclient.isconnected())
+
 @proxyapp.route('/auth')
 def auth():
     if appclient.isconnected():
         return 'Connected to Viima API!  <a href=" /logout">Logout</a>'
     else:
         return render_template('auth.html')
-
-#def token_updater(token):
-#    log.debug('Access token updated. Old = %s  New = %s', session['oauth_token']['access_token'], token['access_token'])
-#    session['oauth_token'] = token
 
 
 @proxyapp.route('/do_auth', methods=['POST'])
@@ -98,7 +102,7 @@ def items():
             response_item = {}
         return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
-        return redirect(url_for('proxyapp.auth'))
+        return redirect(url_for('proxyapp.status'))
 
 @proxyapp.route("/table")
 def table():
@@ -150,7 +154,7 @@ def table():
 
         return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
     else:
-        return redirect(url_for('proxyapp.auth'))
+        return redirect(url_for('proxyapp.status'))
 
 
 @proxyapp.route('/create_item')
@@ -158,7 +162,7 @@ def create_item():
     if appclient.isconnected():
         return render_template('create_item.html')
     else:
-        return redirect(url_for('proxyapp.auth'))
+        return redirect(url_for('proxyapp.status'))
 
 
 @proxyapp.route('/do_create_item', methods=['POST'])
@@ -235,5 +239,5 @@ def do_create_item():
             # We should redirect to a thank you page and then back to create_item_form
             # - May just a simple popup and then back to form
     else:
-        return redirect(url_for('proxyapp.auth'))
+        return redirect(url_for('proxyapp.status'))
     return redirect(url_for('proxyapp.table'))

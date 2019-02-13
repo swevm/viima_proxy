@@ -146,7 +146,6 @@ class Viimawrapper: # I wonder if this inheritance will work??
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
         # Not efficient doing these API calls for every call to /items
