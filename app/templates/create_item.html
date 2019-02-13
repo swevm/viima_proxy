@@ -2,23 +2,24 @@
 
 <form action="/do_create_item" method="POST" class="pure-form">
     <fieldset class="pure-group">
-        <legend>Provide information about yourself</legend>
+        <legend><h3>Provide information about yourself</h3></legend>
         <input type="text" class="pure-input-1-2" placeholder="Enter your name" name="name">
         <input type="email" class="pure-input-1-2" placeholder="Enter your email address" name="emailaddress">
         <input type="text" class="pure-input-1-2" placeholder="Provide your cellphone number" name="cellphone">
     </fieldset>
 
     <fieldset class="pure-group">
-        <legend>Minimal information needed for evaluation</legend>
+        <legend><h3>Bare minimum of details to create a new idea/proposal</h3></legend>
         <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="itemname">
         <textarea class="pure-input-1-2" placeholder="Provide a description about your idea" name="itemdescr"></textarea>
     </fieldset>
 
     <fieldset class="pure-group">
-        <legend>Adding answers here increase your chances significantly</legend>
+        <legend><h3>Adding answers below increase your chances significantly (optional)</h3></legend>
         <textarea class="pure-input-1-2" placeholder="What is the problem this idea solves?" name="itemsolves"></textarea>
         <textarea class="pure-input-1-2" placeholder="What result will it bring?" name="itemresults"></textarea>
     </fieldset>
+    <br>
     <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
 </form>
 
