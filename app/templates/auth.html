@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/static/pure.css" type="text/css">
+
+
+<form action="/do_auth" method="POST" class="pure-form">
+    <fieldset class="pure-group">
+        <legend>Add your Viima Client ID and Client Secret here</legend>
+        <input type="text" class="pure-input-1-2" placeholder="Enter Client Id" name="client_id">
+        <input type="text" class="pure-input-1-2" placeholder="Enter Client Secret" name="client_secret">
+    </fieldset>
+
+    <fieldset class="pure-group">
+        <legend>Viima username and password is required for Oauth2 token to be created</legend>
+        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="username">
+        <input type="password" class="pure-input-1-2" placeholder="Give your idea a name" name="password">
+    </fieldset>
+
+    <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
+</form>
+
+
+

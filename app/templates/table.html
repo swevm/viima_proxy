@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="/static/pure.css" type="text/css">
+<style>
+  tr:nth-child(odd):hover td {
+    background:#4E5066;
+  }
+  tr:hover td {
+    background:#4E5066;
+    color:#FFFFFF;
+    border-top: 1px solid #22262e;
+  }
+</style>
+
+<table class="pure-table pure-table-striped">
+    <thead>
+    <tr>
+        {% for col in friendlycols %}
+            <th>{{ col }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            {% for col in colnames %}
+                <td>{{ record[col] }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
