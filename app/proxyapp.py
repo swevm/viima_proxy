@@ -58,6 +58,15 @@ def status():
     else:
         return render_template('status.html', is_connected=appclient.isconnected())
 
+@proxyapp.route('/thanks')
+def thanks():
+    # Show connection status for backend API
+    if appclient.isconnected():
+        return render_template('thanks.html', is_connected=appclient.isconnected()) #redirect(url_for('proxyapp.items'))  # Add dynamic data to status to show that connecvtion is live or down.
+    else:
+        return render_template('status.html', is_connected=appclient.isconnected())
+
+
 @proxyapp.route('/auth')
 def auth():
 
@@ -190,4 +199,4 @@ def do_create_item():
         #appclient.login(manual=False)
     else:
         return redirect(url_for('proxyapp.status'))
-    return redirect(url_for('proxyapp.table'))
+    return redirect(url_for('proxyapp.thanks'))
