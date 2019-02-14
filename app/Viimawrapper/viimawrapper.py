@@ -4,6 +4,8 @@ import json
 import logging
 import base64
 
+
+mySession = {}
 class Viimawrapper:
     """
         Viimawrapper class is a CRUD wrapper for public Viima REST API that wrap the basic api features in Python methods
@@ -91,6 +93,8 @@ class Viimawrapper:
         self.token = token
         self.logger.debug('Access token updated. New = {} '.format(self.token['access_token']))
 
+
+
     def refresh(self): # Method refreshes cached data, such as Categories, Statuses, Items(think about if its worth caching this data????)
         pass
 
@@ -106,6 +110,10 @@ class Viimawrapper:
             self.client_id = mySession['client_id']
             self.client_secret = mySession['client_secret']
             self.token = mySession['ouath_token']
+
+            if self.token != mySession['ouath_token']:
+                mySession['ouath_token'] = self.token
+                self.writeSession(mySession)   
         else:
             self.client_id = client_id
             self.client_secret = client_secret
@@ -140,6 +148,7 @@ class Viimawrapper:
         #for k, v in self.token:
 
         self.api_connection_state = True
+        print(self.api_connection_state)
         return 1  # Add exception control and return login status with error message if present
 
     def getitems(self): # Result is a combination of items, item status and item category in a json list
