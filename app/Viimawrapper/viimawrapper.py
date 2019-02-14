@@ -106,10 +106,12 @@ class Viimawrapper:
 
     def login(self, username="", password="", client_id="", client_secret="", manual=True, **kwargs):  # BUG: **kwargs seem not to work here as expected. Why?
         if not (manual):
+            #This happens after first login
             mySession = self.readSession()
             self.client_id = mySession['client_id']
             self.client_secret = mySession['client_secret']
             self.token = mySession['ouath_token']
+            self.api_connection_state = True
 
             if self.token != mySession['ouath_token']:
                 mySession['ouath_token'] = self.token
