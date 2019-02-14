@@ -1,50 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="/static/pure.css" type="text/css">
-<style rel="stylesheet" href="/static/pure.css" type="text/css">
-body {font-family: Arial, Helvetica, sans-serif;}
-/* The Modal (background) */
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-}
-
-/* Modal Content */
-.modal-content {
-  background-color: #fefefe;
-  margin: auto;
-  padding: 30px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-/* The Close Button */
-.close {
-  color: #aaaaaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-}
-</style>
 </head>
 <body>
 <link rel="stylesheet" href="/static/pure.css" type="text/css">
@@ -52,15 +8,15 @@ body {font-family: Arial, Helvetica, sans-serif;}
 <form action="/do_create_item" method="POST" class="pure-form">
     <fieldset class="pure-group">
         <legend><h3>Provide information about yourself</h3></legend>
-        <input type="text" class="pure-input-1-2" placeholder="Enter your name" name="name" required>
-        <input type="email" class="pure-input-1-2" placeholder="Enter your email address" name="emailaddress">
-        <input type="text" class="pure-input-1-2" placeholder="Provide your cellphone number" name="cellphone">
+        <input type="text" class="pure-input-1-2" placeholder="Enter your name" name="name"required>
+        <input type="email" class="pure-input-1-2" placeholder="Enter your email address" name="emailaddress"required>
+        <input type="text" class="pure-input-1-2" placeholder="Provide your cellphone number" name="cellphone"required>
     </fieldset>
 
     <fieldset class="pure-group">
         <legend><h3>Bare minimum of details to create a new idea/proposal</h3></legend>
-        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="itemname">
-        <textarea class="pure-input-1-2" placeholder="Provide a description about your idea" name="itemdescr"></textarea>
+        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="itemname"required>
+        <textarea class="pure-input-1-2" placeholder="Provide a description about your idea" name="itemdescr" required></textarea>
     </fieldset>
 
     <fieldset class="pure-group">
@@ -72,46 +28,57 @@ body {font-family: Arial, Helvetica, sans-serif;}
     <button id ="myBtn" type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
 </form>
 
-
-
- 
-<!-- The Modal -->
-<div id="myModal" class="modal">
-
-  <!-- Modal content -->
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <p>Thank you for submitting your idea </p>
-  </div>
-
-</div>
-
 <script>
-// Get the modal
-var modal = document.getElementById('myModal');
+   //This is the first load of is valid, just in case the user gets back again with old inputs
+   //if all the required inputs are filled enable the button
+   var isValid = true;
+     $('input,textarea,select').filter('[required]:visible').each(function() {
+      if ( $(this).val() === '' )
+         isValid = false;
+    });
+    if( isValid ) {
+       $('#myBtn').prop('disabled', false);
+    } else {
+       $('#myBtn').prop('disabled', true);
+    };
+    $('#myBtn').click(function() {
+        var isValid = true;
+         $('input,textarea,select').filter('[required]:visible').each(function() {
+          if ( $(this).val() === '' )
+             isValid = false;
+        });
+        if( isValid ) {
+           $("/do_create_item")[0].submit(); 
+       };
 
-// Get the button that opens the modal
-var btn = document.getElementById("myBtn");
+    });
+    
+    //When a input is changed check all the inputs and if all are filled, enable the button
+     $('input,textarea,select').change(function() {
+        var isValid = true;
+         $('input,textarea,select').filter('[required]:visible').each(function() {
+          if ( $(this).val() === '' )
+             isValid = false;
+        });
+        if( isValid ) {
+           $('#myBtn').prop('disabled', false);
+        } else {
+           $('#myBtn').prop('disabled', true);
+        };
+    });
+    
+    //In case the user edits the button with firebug and removes disabled, check
+    $('#myBtn').click(function() {
+         var isValid = true;
+         $('input,textarea,select').filter('[required]:visible').each(function() {
+          if ( $(this).val() === '' )
+             isValid = false;
+        });
+        if( isValid ) {
+           $("/do_create_item")[0].submit(); 
+       };
+    });
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal 
-btn.onclick = function() {
-  modal.style.display = "block";
-}
-
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-  modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = "none";
-  }
-}
 </script>
 
 </body>

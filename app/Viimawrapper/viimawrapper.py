@@ -148,7 +148,6 @@ class Viimawrapper:
         #for k, v in self.token:
 
         self.api_connection_state = True
-        print(self.api_connection_state)
         return 1  # Add exception control and return login status with error message if present
 
     def getitems(self): # Result is a combination of items, item status and item category in a json list
