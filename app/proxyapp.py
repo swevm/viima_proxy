@@ -3,8 +3,8 @@ import json
 import logging
 import sys
 from app.Viimawrapper.viimawrapper import Viimawrapper
-
-
+import requests
+import time
 # Move configuration parameters to factory - Add a config.py and import from app.config.from_mapping()???
 client_id = ""
 client_secret = ""
@@ -38,6 +38,22 @@ translate_map = {
     'au_status': 'Process stage',
 }
 
+
+def send_data_to_portal(dataBody):
+
+    URL = '***************'
+    header = {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+    
+    body = dataBody
+ 
+    r = requests.post(URL, headers=header, data=json.dumps(body))
+    time.sleep(0.5)
+    print(r)
+
+
 proxyapp = Blueprint('proxyapp', __name__)
 
 
@@ -69,7 +85,7 @@ def thanks():
 
 @proxyapp.route('/auth')
 def auth():
-
+    #appclient.login(manual=False)
     if appclient.isconnected():
         return 'Connected to Viima API!  <a href=" /logout">Logout</a>'
     else:
@@ -102,23 +118,31 @@ def items():
 
             # Loop through items response. Ideas are stored in "[results]"
             for local_item in items['results']:
+                if not (local_item['viima_score']):
+                    response_item['viima_score'] = 0
+                else:
+                    response_item['viima_score'] = local_item['viima_score']
                 # log.debug('Extracted idea item: %s', local_item)
                 response_item['name'] = local_item['name']
                 response_item['fullname'] = local_item['fullname']
                 response_item['hotness'] = local_item['hotness']
                 response_item['vote_count'] = local_item['vote_count']
-                response_item['viima_score'] = local_item['viima_score']
+                
                 for status in statuses:
                     if local_item['status'] == status['id']:
                         response_item['au_status'] = status['name']
                         break
                 response_items.append(response_item)
+                #send data to portal function..
+                #send_data_to_portal(response_item)
                 response_item = {}
-            return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
+                
+            return Response(json.dumps(response_items),  mimetype='application/json', content_type='text/json; charset=utf-8')
         else:
             return redirect(url_for('proxyapp.status'))
     except Exception as e:
-        return render_template('auth.html')
+        print(e)
+        return render_template('status.html')
 
 @proxyapp.route("/table")
 def table():
@@ -172,6 +196,7 @@ def table():
         else:
             return redirect(url_for('proxyapp.status'))
     except Exception as e:
+        print(e)
         return render_template('auth.html')
 
 

@@ -1,4 +1,4 @@
-from oauthlib.oauth2 import LegacyApplicationClient
+from oauthlib.oauth2 import LegacyApplicationClient, TokenExpiredError
 from requests_oauthlib import OAuth2Session
 import json
 import logging
@@ -52,7 +52,8 @@ class Viimawrapper:
         self.client = None  # Holds teh actual client object used to access backend API (with token refresh capability)
         self.extras = {'client_id': self.client_id, 'client_secret': self.client_secret}  # Used for Oauth2 token session handling
         self.sess = {}
-        self.read = None
+        self.protected_url = 'https://app.viima.com/oauth2/token/'
+        #self.dataBody = None
         # Create Oauth2Session - perhaps have these utility functions in a separate method instead of __init__
         # I wondr if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
         self.viimaAppClient = None
@@ -88,6 +89,8 @@ class Viimawrapper:
         """
         return self.api_connection_state
 
+
+
     def token_updater(self, token):
         self.logger.debug('Access token updated. Old = {} '.format(self.token['access_token']))
         self.token = token
@@ -98,6 +101,20 @@ class Viimawrapper:
     def refresh(self): # Method refreshes cached data, such as Categories, Statuses, Items(think about if its worth caching this data????)
         pass
 
+    def send_data_to_portal(self, dataBody):
+
+        URL = '******************'
+        header = {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+        
+        body = dataBody
+     
+        r = requests.post(URL, headers=header, data=json.dumps(body))
+        time.sleep(0.5)
+        print(r)
+
     def get_token(self):
         if self.isconnected():
             return self.token
@@ -106,16 +123,32 @@ class Viimawrapper:
 
     def login(self, username="", password="", client_id="", client_secret="", manual=True, **kwargs):  # BUG: **kwargs seem not to work here as expected. Why?
         if not (manual):
-            #This happens after first login
+            #This happens after first login otherwise user have to log in manually
+            #Read file
             mySession = self.readSession()
             self.client_id = mySession['client_id']
             self.client_secret = mySession['client_secret']
             self.token = mySession['ouath_token']
-            self.api_connection_state = True
+            #check if token is expired
+            try:
+                self.client = OAuth2Session(self.client_id, token=self.token)
+                r = self.client.get(self.protected_url)
+            #if token is expired write to file again
+            except TokenExpiredError as e:
+                self.token = client.refresh_token(self.protected_url, self.extras)
+                token_updater(self.token)
+                self.sess['client_id'] = client_id
+                self.sess['client_secret'] = client_secret
+                self.sess['ouath_token'] = self.token
+                self.writeSession(self.sess)
+                self.api_connection_state = True
 
+            self.client = OAuth2Session(self.client_id, token=self.token)
+            self.api_connection_state = True
+            
             if self.token != mySession['ouath_token']:
                 mySession['ouath_token'] = self.token
-                self.writeSession(mySession)   
+                self.writeSession(mySession)
         else:
             self.client_id = client_id
             self.client_secret = client_secret
@@ -133,13 +166,16 @@ class Viimawrapper:
                     client_id=self.client_id,
                     client_secret=self.client_secret,
                     scope=self.scope)
-               
+               # self.client = Oauth2Session(self.client_id, token = self.token)
+                #r.client.get(protected_url)    
                 #print("Login token:  %s", self.token)
                 #print(self.client_id, client_secret)
                 self.sess['client_id'] = client_id
                 self.sess['client_secret'] = client_secret
                 self.sess['ouath_token'] = self.token
                 self.writeSession(self.sess)
+            #except TokenExpiredError as e:
+                #token = client.refresh_token(self.protected_url, extras)
 
             except Exception as e:
                 print("Exception in login: %s", e)
@@ -172,6 +208,14 @@ class Viimawrapper:
             print(e)
             self.logger.error('getitems() error: {}'.format(e))
             self.api_connection_state = False
+            try:
+                self.client = OAuth2Session(self.client_id, token=self.token)
+                r = self.client.get(self.protected_url)
+
+            except TokenExpiredError as e:
+                self.token = client.refresh_token(self.protected_url, self.extras)
+                token_updater(token)
+                self.api_connection_state = True
             return -1
         return items
 
@@ -256,7 +300,7 @@ class Viimawrapper:
             response = self.client.post('https://app.viima.com/api/customers/' + self.customer_id + '/items/',
                                         data=json.dumps(item_data),
                                         headers=headers)
-
+            #self.send_data_to_portal(self.item_data)
             self.logger.debug('do_item_create(add idea) - POST response status code: {}'.format(response.status_code))
             self.logger.debug('do_item_create(add idea) - POST response: {}'.format(response.json()))
             response_content_json = response.json()
@@ -436,3 +480,11 @@ class Viimawrapper:
             self.api_connection_state = False
             return -1
         return response
+    def refreshtoken ():
+        try:
+            self.client = OAuth2Session(self.client_id, token=self.token)
+            r = client.get(protected_url)
+        except TokenExpiredError as e:
+            self.token = client.refresh_token(protected_url, self.extras)
+            token_updater(token)
+        self.client = OAuth2Session(self.client_id, token=self.token) 
