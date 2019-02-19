@@ -67,26 +67,33 @@ def home():
 @proxyapp.route('/auth')
 def auth():
     if appclient.isconnected():
-
-        return render_template('items.html')
+        return redirect(url_for('proxyapp.items'))
     else:
         return render_template('auth.html')
 
 
 @proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
-    appclient.login(request.form['username'],
-                    request.form['password'],
-                    request.form['client_id'],
-                    request.form['client_secret'],
-                    scope=scope)
+    print(len(appclient.readSession()))
+    if len(appclient.readSession()) <= 0:
+
+        appclient.login(request.form['username'],
+                        request.form['password'],
+                        request.form['client_id'],
+                        request.form['client_secret'],
+                        scope=scope)
     
-    return redirect(url_for('proxyapp.items'))
+        return redirect(url_for('proxyapp.items'))
+    else:
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.items'))
 
 
 @proxyapp.route("/items")
 def items():
+    
     if appclient.isconnected():
+        
         items = appclient.getitems()
         statuses = appclient.getstatuses()
         response_item = {}
@@ -109,7 +116,9 @@ def items():
 
         return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
-        return redirect(url_for('proxyapp.status'))
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.items'))
+
 @proxyapp.route('/status')
 def status():
     # Show connection status for backend API
@@ -172,7 +181,8 @@ def table():
 
         return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
     else:
-        return redirect(url_for('proxyapp.status'))
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.table'))
 
 
 @proxyapp.route('/create_item')
@@ -193,5 +203,6 @@ def do_create_item():
                              itemsolves=request.form['itemsolves'],
                              itemresults=request.form['itemresults'])
     else:
+        appclient.login(manual=False)
         return redirect(url_for('proxyapp.status'))
     return redirect(url_for('proxyapp.thanks'))

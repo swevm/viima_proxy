@@ -53,7 +53,6 @@ class Viimawrapper:
         self.extras = {'client_id': self.client_id, 'client_secret': self.client_secret}  # Used for Oauth2 token session handling
         self.sess = {}
         self.ref_token = None
-        self.counter = 0
         # Create Oauth2Session - perhaps have these utility functions in a separate method instead of __init__
         # I wondr if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
         self.viimaAppClient = None
@@ -115,38 +114,39 @@ class Viimawrapper:
         time.sleep(0.5)
         print(r)
 
-    def login(self, username="", password="", client_id="", client_secret="", manual=False, **kwargs):  # BUG: **kwargs seem not to work here as expected. Why?
-        if manual:
-            
-            #Open file.
-            mySession = self.readSession()
-            print(mySession)
-            self.client_id = mySession['client_id']
-            self.client_secret = mySession['client_secret']
-            self.ref_token = mySession['ouath_token']['refresh_token']
-            print(self.ref_token)
-            payload = {'client_id': self.client_id, 'client_secret' : self.client_secret, 'grant_type': 'refresh_token', 'refresh_token': self.ref_token}
-            Header = {
-                     "Content-Type" : "application/x-www-form-urlencoded" 
-            }
-            #Refresh Token
-            r = requests.post("https://app.viima.com/oauth2/token/", data = payload, headers=Header)
-            #postar = self.post('https://app.viima.com/oauth2/token/', payload)
-            print("-------------------------------------------")
-            #print(r.text)
-            #New Token
-            self.token = r.json()
-            #print("-------------------------------------------")
-            print("TOKEN") 
-            print(self.token) 
-            self.sess['client_id'] = client_id
-            self.sess['client_secret'] = client_secret
-            self.sess['ouath_token'] = self.token
-            self.writeSession(self.sess)
-            self.api_connection_state = True
-            self.counter = 1
-            return 1
-        else:      
+    def login(self, username="", password="", client_id="", client_secret="", manual=True, **kwargs):  # BUG: **kwargs seem not to work here as expected. Why?
+        if not manual:
+            try:
+                #Open file.
+                mySession = self.readSession()
+                if len(mySession) <= 0:
+                    print("hhhhhhhhhhhhhhhhhhhhhhhhhhh")
+                self.client_id = mySession['client_id']
+                self.client_secret = mySession['client_secret']
+                self.ref_token = mySession['ouath_token']['refresh_token']
+                payload = {'client_id': self.client_id, 'client_secret' : self.client_secret, 'grant_type': 'refresh_token', 'refresh_token': self.ref_token}
+                Header = {
+                         "Content-Type" : "application/x-www-form-urlencoded" 
+                }
+                #Refresh Token
+                r = requests.post("https://app.viima.com/oauth2/token/", data = payload, headers=Header)
+
+                # Save New Token
+                self.token = r.json() 
+                self.sess['client_id'] = self.client_id
+                self.sess['client_secret'] = self.client_secret
+                self.sess['ouath_token'] = self.token
+                self.writeSession(self.sess)
+                self.api_connection_state = True
+                self.counter = 1
+                return 1
+            except Exception as e:
+                print("Exception in login: %s", e)
+                self.logger.error("Please log in")
+                self.api_connection_state = False
+                return -1    
+        else: 
+            #Manual login
             self.client_id = client_id
             self.client_secret = client_secret
 
@@ -164,6 +164,7 @@ class Viimawrapper:
                     client_id=self.client_id,
                     client_secret=self.client_secret,
                     scope=self.scope)
+
                 print("Login token:  %s", self.token)
                 self.sess['client_id'] = client_id
                 self.sess['client_secret'] = client_secret
@@ -260,6 +261,7 @@ class Viimawrapper:
             print(e)
             self.logger.error('getitem() error: {}'.format(e))
             self.api_connection_state = False
+
             return -1
         return item
 

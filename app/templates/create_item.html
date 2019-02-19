@@ -2,27 +2,28 @@
 <html>
 <head>
 </head>
-<body style="overflow: hidden;">
+<body style="overflow: hidden;" align="center">
 <link rel="stylesheet" href="/static/pure.css" type="text/css">
 
-<form action="/do_create_item" method="POST" class="pure-form" style="left: 50%">
+<form action="/do_create_item" method="POST" class="pure-form">
+    
     <fieldset class="pure-group">
         <legend><h3>Provide information about yourself</h3></legend>
-        <input type="text" class="pure-input-1-2" placeholder="Enter your name" name="name"required>
-        <input type="email" class="pure-input-1-2" placeholder="Enter your email address" name="emailaddress"required>
-        <input type="text" class="pure-input-1-2" placeholder="Provide your cellphone number" name="cellphone"required>
+        <input type="text" class="pure-input-1" placeholder="Enter your name" name="name"required>
+        <input type="email" class="pure-input-1" placeholder="Enter your email address" name="emailaddress"required>
+        <input type="text" class="pure-input-1" placeholder="Provide your cellphone number" name="cellphone"required>
     </fieldset>
 
     <fieldset class="pure-group">
         <legend><h3>Bare minimum of details to create a new idea/proposal</h3></legend>
-        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="itemname"required>
-        <textarea class="pure-input-1-2" placeholder="Provide a description about your idea" name="itemdescr" required></textarea>
+        <input type="text" class="pure-input-1" placeholder="Give your idea a name" name="itemname"required>
+        <textarea class="pure-input-1" placeholder="Provide a description about your idea" name="itemdescr" required></textarea>
     </fieldset>
 
     <fieldset class="pure-group">
         <legend><h3>Adding answers below increase your chances significantly (optional)</h3></legend>
-        <textarea class="pure-input-1-2" placeholder="What is the problem this idea solves?" name="itemsolves"></textarea>
-        <textarea class="pure-input-1-2" placeholder="What result will it bring?" name="itemresults"></textarea>
+        <textarea class="pure-input-1" placeholder="What is the problem this idea solves?" name="itemsolves"></textarea>
+        <textarea class="pure-input-1" placeholder="What result will it bring?" name="itemresults"></textarea>
     </fieldset>
     <br>
     <button id ="myBtn" type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>

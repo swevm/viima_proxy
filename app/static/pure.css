@@ -1031,8 +1031,10 @@ since IE8 won't execute CSS that contains a CSS3 selector.
     margin: 0;
     padding: 0.35em 0 0.75em;
     border: 0;
+    text-align: center
 }
 .pure-form legend {
+    
     display: block;
     width: 100%;
     padding: 0.3em 0;
@@ -1111,6 +1113,7 @@ since IE8 won't execute CSS that contains a CSS3 selector.
 /* Grouped Inputs */
 .pure-form .pure-group fieldset {
     margin-bottom: 10px;
+    align-items: center
 }
 .pure-form .pure-group input,
 .pure-form .pure-group textarea {
@@ -1120,6 +1123,7 @@ since IE8 won't execute CSS that contains a CSS3 selector.
     border-radius: 0;
     position: relative;
     top: -1px;
+    align-items: center
 }
 .pure-form .pure-group input:focus,
 .pure-form .pure-group textarea:focus {
