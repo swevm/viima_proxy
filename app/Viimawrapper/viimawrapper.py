@@ -119,8 +119,6 @@ class Viimawrapper:
             try:
                 #Open file.
                 mySession = self.readSession()
-                if len(mySession) <= 0:
-                    print("hhhhhhhhhhhhhhhhhhhhhhhhhhh")
                 self.client_id = mySession['client_id']
                 self.client_secret = mySession['client_secret']
                 self.ref_token = mySession['ouath_token']['refresh_token']

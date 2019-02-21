@@ -3,8 +3,8 @@ import json
 import logging
 import sys
 from app.Viimawrapper.viimawrapper import Viimawrapper
-
-
+import requests
+import time
 # Move configuration parameters to factory - Add a config.py and import from app.config.from_mapping()???
 client_id = ""
 client_secret = ""
@@ -36,17 +36,18 @@ translate_map = {
     'vote_count': 'vote count',
     'viima_score': 'AU Points',
     'au_status': 'Process stage',
+    'description': 'description',
 }
 def send_data_to_portal(dataBody):
 
-    URL = '***************'
+    URL = '*********'
     header = {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
     
     body = dataBody
- 
+    
     r = requests.post(URL, headers=header, data=json.dumps(body))
     time.sleep(0.5)
     print(r)
@@ -107,13 +108,15 @@ def items():
             response_item['hotness'] = local_item['hotness']
             response_item['vote_count'] = local_item['vote_count']
             response_item['viima_score'] = local_item['viima_score']
+            response_item['description'] = local_item['description']
             for status in statuses:
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
+            #send_data_to_portal(response_item)
             response_item = {}
-
+            
         return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
         appclient.login(manual=False)
@@ -143,6 +146,8 @@ def table():
         statuses = appclient.getstatuses()
         response_item = {}
         response_items = []
+        description = {}
+        descriptions = []
         # Loop through items response. Ideas are stored in "[results]"
 
         #
@@ -155,11 +160,15 @@ def table():
             response_item['hotness'] = round(float(local_item['hotness']), 1)
             response_item['vote_count'] = local_item['vote_count']
             response_item['viima_score'] = local_item['viima_score']
+            description['description'] = local_item['description']
+            description['name'] = local_item['name']
+
             for status in statuses:
                 if status['id'] == local_item['status']:
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
+            descriptions.append(description)
             log.debug('Response item(local): {}'.format(response_item))
             response_item = {}
 
@@ -179,7 +188,7 @@ def table():
                         friendlylabels.append(translate_map[friendlydescr])
             break  # Break - So that we only extract column names once. There must be better ways to do this?
 
-        return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
+        return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels, descs=descriptions)
     else:
         appclient.login(manual=False)
         return redirect(url_for('proxyapp.table'))
