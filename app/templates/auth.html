@@ -5,47 +5,47 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
+ 
   <title>Idébanken</title>
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="static/font/roboto">
+  <link rel="stylesheet" src="static/font/roboto">
   <!-- Bootstrap core CSS -->
   <link href="static/css/bootstrap.min.css" rel="stylesheet">
   <!-- Material Design Bootstrap -->
   <link href="static/css/mdb.min.css" rel="stylesheet">
   <!-- Your custom styles (optional) -->
-  <link href="static/css/style.css" rel="stylesheet">
+  <!-- DataTables Select CSS -->
+  <link href="static/css/addons/datatables.min.css" rel="stylesheet">
 </head>
 
 <body>
    
 <form class="border border-light p-5" action="/do_auth" method="POST">
-     <img src="static/maxresdefault.jpg" class="img-fluid z-depth-1" alt="Responsive image" style="margin:  0 auto;">
-    <p class="h4 mb-4 text-center">Logga in</p>
+     <img src="static/maxresdefault.jpg" class="img-fluid" alt="Responsive image" style="margin:  0 auto;" >
+   <legend><h3 class="text-center">Logga in</h3></legend>
         <label for="textInput">Viima Client ID</label>
-        <input type="text" id="textInput" class="form-control mb-4" placeholder="Enter Client Id" name="client_id">
+        <input type="text" id="textInput" class="form-control mb-4" placeholder="Client Id" name="client_id" required>
         <label for="textInput">Client Secret</label>
-        <input type="text" id="textInput"  class="form-control" placeholder="Enter Client Secret" name="client_secret">
+        <input type="text" id="textInput"  class="form-control" placeholder="Client Secret" name="client_secret" required>
 
 
    
         
         <label for="textInput">Användarnamn</label>
-        <input type="text" id="textInput" class="form-control mb-4" placeholder="Username" name="username">
+        <input type="text" id="textInput" class="form-control mb-4" placeholder="Username" name="username" required>
         <label for="textInput">Lösenord</label>
-        <input type="password" id="textInput" class="form-control mb-4" placeholder="Password" name="password">
+        <input type="password" id="textInput" class="form-control mb-4" placeholder="Password" name="password" required>
         <div class="d-flex justify-content-between">
             <div>
                 <div class="custom-control custom-checkbox">
                     <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember">
-                    <label class="custom-control-label" for="defaultLoginFormRemember">Remember me</label>
+                    <label class="custom-control-label" for="defaultLoginFormRemember">Kom ihåg mig</label>
                 </div>
             </div>
-            <div>
-                <a href="">Forgot password?</a>
-            </div>
+           
         </div>
 
-    <button type="submit" class="btn btn-primary btn-block my-4">Submit</button>
+    <button type="submit" class="btn btn-info btn-block">Logga in</button>
 </form>
 
 <!-- JQuery -->
@@ -59,7 +59,7 @@
 
 </body>
 <!-- Footer -->
-<footer class="page-footer font-small blue">
+<footer class="page-footer font-small info">
 
   <!-- Copyright -->
   <div class="footer-copyright text-center py-3">© 2018 Copyright:

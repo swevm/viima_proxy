@@ -30,13 +30,13 @@ scope = [
 appclient = Viimawrapper(customer_id, authorization_base_url, api_base_url)
 
 translate_map = {
-    'name': 'Name of idea',
-    'fullname': 'Creator',
+    'name': 'Namn på Idé',
+    'created': 'Skapad  ',
     'hotness': 'hotness',
-    'vote_count': 'vote count',
-    'viima_score': 'AU Points',
-    'au_status': 'Process stage',
-    'description': 'description',
+    'vote_count': 'Röster',
+    'viima_score': 'Poäng',
+    'au_status': 'Status',
+    'description': 'Beskrivning',
 }
 def send_data_to_portal(dataBody):
 
@@ -84,10 +84,10 @@ def do_auth():
                         request.form['client_secret'],
                         scope=scope)
     
-        return redirect(url_for('proxyapp.items'))
+        return redirect(url_for('proxyapp.table'))
     else:
         appclient.login(manual=False)
-        return redirect(url_for('proxyapp.items'))
+        return redirect(url_for('proxyapp.table'))
 
 
 @proxyapp.route("/items")
@@ -156,19 +156,19 @@ def table():
         #
         for local_item in items['results']:
             response_item['name'] = local_item['name']
-            response_item['fullname'] = local_item['fullname']
+            response_item['created'] = local_item['created'].replace("T"," ").split(".")[0]
             response_item['hotness'] = round(float(local_item['hotness']), 1)
             response_item['vote_count'] = local_item['vote_count']
             response_item['viima_score'] = local_item['viima_score']
-            description['description'] = local_item['description']
-            description['name'] = local_item['name']
+            #description['description'] = local_item['description']
+            #description['name'] = local_item['name']
 
             for status in statuses:
                 if status['id'] == local_item['status']:
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
-            descriptions.append(description)
+            #descriptions.append(description)
             log.debug('Response item(local): {}'.format(response_item))
             response_item = {}
 
@@ -188,7 +188,7 @@ def table():
                         friendlylabels.append(translate_map[friendlydescr])
             break  # Break - So that we only extract column names once. There must be better ways to do this?
 
-        return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels, descs=descriptions)
+        return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
     else:
         appclient.login(manual=False)
         return redirect(url_for('proxyapp.table'))
@@ -205,7 +205,7 @@ def create_item():
 @proxyapp.route('/do_create_item', methods=['POST'])
 def do_create_item():
     if appclient.isconnected():
-        appclient.createitem(request.form['itemname'],
+        appclient.createitem(request.form['name'],
                              request.form['emailaddress'],
                              request.form['itemname'],
                              request.form['itemdescr'],

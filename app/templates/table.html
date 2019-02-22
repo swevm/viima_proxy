@@ -5,6 +5,7 @@
  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta http-equiv="refresh" content="120">
   <title>Idébanken</title>
   <!-- Font Awesome -->
   <link rel="stylesheet" src="static/font/roboto">
@@ -72,9 +73,25 @@
   <!-- MDBootstrap Datatables  -->
 <script type="text/javascript" src="static/js/addons/datatables.min.js"></script>
 
-<script >
+<script>
     $(document).ready(function () {
-$('#dtBasicExample').DataTable();
+$('#dtBasicExample').DataTable( {
+   "language": {
+            "lengthMenu": "Visa _MENU_ förslag per sida",
+            "zeroRecords": "Din sökning gav inga resultat",
+            "info": "Visar _START_ till _END_ av _TOTAL_ förslag",
+            "infoEmpty": "Inga resultat funna",
+            "infoFiltered": "(filtrerat på _MAX_ förslag)",
+            "paginate": {
+                    "first":      "Första",
+                    "last":       "Sista",
+                    "next":       "Nästa",
+                    "previous":   "Föregående"
+            },
+            "search": "Sök:",
+
+    }
+ });
 $('.dataTables_length').addClass('bs-select');
 });
 </script>
