@@ -51,6 +51,7 @@ def send_data_to_portal(dataBody):
     time.sleep(0.5)
     print(r)
 
+
 proxyapp = Blueprint('proxyapp', __name__)
 
 
@@ -61,7 +62,6 @@ def home():
         return redirect(url_for('proxyapp.items'))
     else:
         return redirect(url_for('proxyapp.auth'))
-
 
 
 @proxyapp.route('/auth')
@@ -161,8 +161,15 @@ def table():
             response_item['name'] = local_item['name']
             response_item['fullname'] = local_item['fullname']
             response_item['hotness'] = round(float(local_item['hotness']), 1)
-            response_item['vote_count'] = local_item['vote_count']
-            response_item['viima_score'] = local_item['viima_score']
+            if local_item['vote_count'] is None:
+                response_item['vote_count'] = 0
+            else:
+                response_item['vote_count'] = local_item['vote_count']
+            if local_item['viima_score'] is None:
+                response_item['viima_score'] = 0
+            else:
+                response_item['viima_score'] = round(float(local_item['viima_score']), 1)
+            #response_item['viima_score'] = local_item['viima_score']
             #description['description'] = local_item['description']
             #description['name'] = local_item['name']
 
