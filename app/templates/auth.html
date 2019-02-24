@@ -1,21 +1,72 @@
-<link rel="stylesheet" href="/static/pure.css" type="text/css">
+
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+ 
+  <title>Idébanken</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" src="static/font/roboto">
+  <!-- Bootstrap core CSS -->
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="static/css/mdb.min.css" rel="stylesheet">
+  <!-- Your custom styles (optional) -->
+  <!-- DataTables Select CSS -->
+  <link href="static/css/addons/datatables.min.css" rel="stylesheet">
+</head>
+
+<body>
+   
+<form class="border border-light p-5" action="/do_auth" method="POST">
+     <img src="static/maxresdefault.jpg" class="img-fluid" alt="Responsive image" style="margin:  0 auto;" >
+   <legend><h3 class="text-center">Logga in</h3></legend>
+        <label for="textInput">Viima Client ID</label>
+        <input type="text" id="textInput" class="form-control mb-4" placeholder="Client Id" name="client_id" required>
+        <label for="textInput">Client Secret</label>
+        <input type="text" id="textInput"  class="form-control" placeholder="Client Secret" name="client_secret" required>
 
 
-<form action="/do_auth" method="POST" class="pure-form">
-    <fieldset class="pure-group">
-        <legend>Add your Viima Client ID and Client Secret here</legend>
-        <input type="text" class="pure-input-1-2" placeholder="Enter Client Id" name="client_id">
-        <input type="text" class="pure-input-1-2" placeholder="Enter Client Secret" name="client_secret">
-    </fieldset>
+   
+        
+        <label for="textInput">Användarnamn</label>
+        <input type="text" id="textInput" class="form-control mb-4" placeholder="Username" name="username" required>
+        <label for="textInput">Lösenord</label>
+        <input type="password" id="textInput" class="form-control mb-4" placeholder="Password" name="password" required>
+        <div class="d-flex justify-content-between">
+            <div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="defaultLoginFormRemember">
+                    <label class="custom-control-label" for="defaultLoginFormRemember">Kom ihåg mig</label>
+                </div>
+            </div>
+           
+        </div>
 
-    <fieldset class="pure-group">
-        <legend>Viima username and password is required for Oauth2 token to be created</legend>
-        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="username">
-        <input type="password" class="pure-input-1-2" placeholder="Give your idea a name" name="password">
-    </fieldset>
-
-    <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
+    <button type="submit" class="btn btn-info btn-block">Logga in</button>
 </form>
 
+<!-- JQuery -->
+  <script type="text/javascript" src="static/js/jquery-3.3.1.min.js"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="static/js/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="static/js/mdb.js"></script>
 
+</body>
+<!-- Footer -->
+<footer class="page-footer font-small info">
 
+  <!-- Copyright -->
+  <div class="footer-copyright text-center py-3">© 2018 Copyright:
+    <a href="https://www.atea.se/"> Atea.se</a>
+  </div>
+  <!-- Copyright -->
+
+</footer>
+<!-- Footer -->
+</html>

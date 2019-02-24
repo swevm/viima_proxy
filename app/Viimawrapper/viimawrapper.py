@@ -2,6 +2,11 @@ from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 import json
 import logging
+import time
+import base64
+import requests
+mySession = {}
+newSess = {}
 
 
 class Viimawrapper:
@@ -49,9 +54,10 @@ class Viimawrapper:
         self.token = {}  # Default to empty token dict
         self.client = None  # Holds teh actual client object used to access backend API (with token refresh capability)
         self.extras = {'client_id': self.client_id, 'client_secret': self.client_secret}  # Used for Oauth2 token session handling
-
+        self.sess = {}
+        self.ref_token = None
         # Create Oauth2Session - perhaps have these utility functions in a separate method instead of __init__
-        # I wondr if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
+        # I wonder if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
         self.viimaAppClient = None
 
         self.api_connection_state = False  # True if class har working connection to Viima API
@@ -60,12 +66,30 @@ class Viimawrapper:
     def connect(self, username, password):
         pass
 
+    def writeSession(self, sess):
+        encoded_session = base64.b64encode(bytes(json.dumps(self.sess) ,'utf-8'))
+        txt = open("binary.sn","wb")
+        txt.write(encoded_session)
+        txt.close()
+
+    def readSession(self):
+        try:
+            data = open("binary.sn", "r").read()
+            decoded = base64.b64decode(data)
+            decoded = decoded.decode()
+            session = json.loads(decoded)
+        except:
+            session = {}
+            #print(session)
+        return session
+
     def isconnected(self):
         """
                 Returns
                 -------
                 Boolean - True for connected to Viima API otherwise false
         """
+        self.logger.debug('isconnected() = {} '.format(self.api_connection_state))
         return self.api_connection_state
 
     def token_updater(self, token):
@@ -82,34 +106,82 @@ class Viimawrapper:
         else:
             return False
 
-    def login(self, username, password, client_id, client_secret, **kwargs):  # BUG: **kwargs seem not to work here as expected. Why?
-        self.client_id = client_id
-        self.client_secret = client_secret
-        for key, value in kwargs.items():
-            if key == 'scope':
-                self.scope = value
-        try:
-            self.viimaAppClient = OAuth2Session(
-                client=LegacyApplicationClient(client_id=self.client_id), scope=self.scope)
+    def send_data_to_portal(self, dataBody):
+        URL = '******************'
+        header = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+        body = dataBody
+        r = requests.post(URL, headers=header, data=json.dumps(body))
+        time.sleep(0.5)
+        print(r)
 
-            self.token = self.viimaAppClient.fetch_token(
-                token_url=self.authorization_url,
-                username=username,
-                password=password,
-                client_id=self.client_id,
-                client_secret=self.client_secret,
-                scope=self.scope)
-            print("Login token:  %s", self.token)
-        except Exception as e:
-            print("Exception in login: %s", e)
-            self.logger.error('Login() error: %s', e)
-            self.api_connection_state = False
-            return -1
-        # Validate that token contain, access_token, refresh_token
-        #for k, v in self.token:
+    def login(self, username="", password="", client_id="", client_secret="", manual=True, **kwargs):  # BUG: **kwargs seem not to work here as expected. Why?
+        if not manual:
+            try:
+                #Open file.
+                mySession = self.readSession()
+                self.client_id = mySession['client_id']
+                self.client_secret = mySession['client_secret']
+                self.ref_token = mySession['ouath_token']['refresh_token']
+                payload = {'client_id': self.client_id, 'client_secret' : self.client_secret, 'grant_type': 'refresh_token', 'refresh_token': self.ref_token}
+                Header = {
+                         "Content-Type" : "application/x-www-form-urlencoded"
+                }
+                #Refresh Token
+                r = requests.post("https://app.viima.com/oauth2/token/", data = payload, headers=Header)
 
-        self.api_connection_state = True
-        return 1  # Add exception control and return login status with error message if present
+                # Save New Token
+                self.token = r.json()
+                self.sess['client_id'] = self.client_id
+                self.sess['client_secret'] = self.client_secret
+                self.sess['ouath_token'] = self.token
+                self.writeSession(self.sess)
+                self.api_connection_state = True
+                self.counter = 1
+                return 1
+            except Exception as e:
+                print("Exception in login: %s", e)
+                self.logger.error("Please log in")
+                self.api_connection_state = False
+                return -1
+        else:
+            #Manual login
+            self.client_id = client_id
+            self.client_secret = client_secret
+
+            for key, value in kwargs.items():
+                if key == 'scope':
+                    self.scope = value
+            try:
+                self.viimaAppClient = OAuth2Session(
+                    client=LegacyApplicationClient(client_id=self.client_id), scope=self.scope)
+
+                self.token = self.viimaAppClient.fetch_token(
+                    token_url=self.authorization_url,
+                    username=username,
+                    password=password,
+                    client_id=self.client_id,
+                    client_secret=self.client_secret,
+                    scope=self.scope)
+
+                print("Login token:  %s", self.token)
+                self.sess['client_id'] = client_id
+                self.sess['client_secret'] = client_secret
+                self.sess['ouath_token'] = self.token
+                self.writeSession(self.sess)
+
+            except Exception as e:
+                print("Exception in login: %s", e)
+                self.logger.error('Login() error: %s', e)
+                self.api_connection_state = False
+                return -1
+            # Validate that token contain, access_token, refresh_token
+            #for k, v in self.token:
+
+            self.api_connection_state = True
+            return 1  # Add exception control and return login status with error message if present
 
     def getitems(self): # Result is a combination of items, item status and item category in a json list
         """
@@ -122,7 +194,6 @@ class Viimawrapper:
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             #print(self.client)
@@ -190,6 +261,7 @@ class Viimawrapper:
             print(e)
             self.logger.error('getitem() error: {}'.format(e))
             self.api_connection_state = False
+
             return -1
         return item
 

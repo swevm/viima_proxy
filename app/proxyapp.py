@@ -3,8 +3,8 @@ import json
 import logging
 import sys
 from app.Viimawrapper.viimawrapper import Viimawrapper
-
-
+import requests
+import time
 # Move configuration parameters to factory - Add a config.py and import from app.config.from_mapping()???
 client_id = ""
 client_secret = ""
@@ -30,13 +30,26 @@ scope = [
 appclient = Viimawrapper(customer_id, authorization_base_url, api_base_url)
 
 translate_map = {
-    'name': 'Name of idea',
-    'fullname': 'Creator',
-    'hotness': 'hotness',
-    'vote_count': 'vote count',
-    'viima_score': 'AU Points',
-    'au_status': 'Process stage',
+    'name': 'Namn på idé',
+    'fullname': 'Skapad',
+    'hotness': 'Aktivitsnivå',
+    'vote_count': 'Röster',
+    'viima_score': 'AU poäng',
+    'au_status': 'Status',
+    'description': 'Beskrivning',
 }
+def send_data_to_portal(dataBody):
+    URL = '*********'
+    header = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
+    body = dataBody
+
+    r = requests.post(URL, headers=header, data=json.dumps(body))
+    time.sleep(0.5)
+    print(r)
 
 proxyapp = Blueprint('proxyapp', __name__)
 
@@ -50,13 +63,6 @@ def home():
         return redirect(url_for('proxyapp.auth'))
 
 
-@proxyapp.route('/status')
-def status():
-    # Show connection status for backend API
-    if appclient.isconnected():
-        return render_template('status.html', is_connected=appclient.isconnected()) #redirect(url_for('proxyapp.items'))  # Add dynamic data to status to show that connecvtion is live or down.
-    else:
-        return render_template('status.html', is_connected=appclient.isconnected())
 
 @proxyapp.route('/auth')
 def auth():
@@ -68,17 +74,26 @@ def auth():
 
 @proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
-    appclient.login(request.form['username'],
-                    request.form['password'],
-                    request.form['client_id'],
-                    request.form['client_secret'],
-                    scope=scope)
-    return redirect(url_for('proxyapp.items'))
+    print(len(appclient.readSession()))
+    if len(appclient.readSession()) <= 0:
+
+        appclient.login(request.form['username'],
+                        request.form['password'],
+                        request.form['client_id'],
+                        request.form['client_secret'],
+                        scope=scope)
+
+        return redirect(url_for('proxyapp.table'))
+    else:
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.table'))
 
 
 @proxyapp.route("/items")
 def items():
+
     if appclient.isconnected():
+
         items = appclient.getitems()
         statuses = appclient.getstatuses()
         response_item = {}
@@ -92,15 +107,38 @@ def items():
             response_item['hotness'] = local_item['hotness']
             response_item['vote_count'] = local_item['vote_count']
             response_item['viima_score'] = local_item['viima_score']
+            response_item['description'] = local_item['description']
             for status in statuses:
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
+            #send_data_to_portal(response_item)
             response_item = {}
+
         return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
-        return redirect(url_for('proxyapp.status'))
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.items'))
+
+
+@proxyapp.route('/status')
+def status():
+    # Show connection status for backend API
+    if appclient.isconnected():
+        return render_template('status.html', is_connected=appclient.isconnected()) #redirect(url_for('proxyapp.items'))  # Add dynamic data to status to show that connecvtion is live or down.
+    else:
+        return render_template('status.html', is_connected=appclient.isconnected())
+
+
+@proxyapp.route('/thanks')
+def thanks():
+    # Show connection status for backend API
+    if appclient.isconnected():
+        return render_template('thanks.html', is_connected=appclient.isconnected()) #redirect(url_for('proxyapp.items'))  # Add dynamic data to status to show that connecvtion is live or down.
+    else:
+        return render_template('status.html', is_connected=appclient.isconnected())
+
 
 @proxyapp.route("/table")
 def table():
@@ -111,6 +149,8 @@ def table():
         statuses = appclient.getstatuses()
         response_item = {}
         response_items = []
+        description = {}
+        descriptions = []
         # Loop through items response. Ideas are stored in "[results]"
 
         #
@@ -123,11 +163,15 @@ def table():
             response_item['hotness'] = round(float(local_item['hotness']), 1)
             response_item['vote_count'] = local_item['vote_count']
             response_item['viima_score'] = local_item['viima_score']
+            #description['description'] = local_item['description']
+            #description['name'] = local_item['name']
+
             for status in statuses:
                 if status['id'] == local_item['status']:
                     response_item['au_status'] = status['name']
                     break
             response_items.append(response_item)
+            #descriptions.append(description)
             log.debug('Response item(local): {}'.format(response_item))
             response_item = {}
 
@@ -149,7 +193,10 @@ def table():
 
         return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
     else:
-        return redirect(url_for('proxyapp.status'))
+        if appclient.login(manual=False) == 1:
+            return redirect(url_for('proxyapp.table'))
+        else:
+            return redirect(url_for('proxyapp.status'))
 
 
 @proxyapp.route('/create_item')
@@ -163,12 +210,13 @@ def create_item():
 @proxyapp.route('/do_create_item', methods=['POST'])
 def do_create_item():
     if appclient.isconnected():
-        appclient.createitem(request.form['itemname'],
+        appclient.createitem(request.form['name'],
                              request.form['emailaddress'],
                              request.form['itemname'],
                              request.form['itemdescr'],
                              itemsolves=request.form['itemsolves'],
                              itemresults=request.form['itemresults'])
     else:
+        appclient.login(manual=False)
         return redirect(url_for('proxyapp.status'))
-    return redirect(url_for('proxyapp.table'))
+    return redirect(url_for('proxyapp.thanks'))

@@ -1,25 +1,124 @@
-<link rel="stylesheet" href="/static/pure.css" type="text/css">
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Idébanken</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" src="static/font/roboto">
+  <!-- Bootstrap core CSS -->
+  <link href="static/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="static/css/mdb.min.css" rel="stylesheet">
+  <!-- Your custom styles (optional) -->
+  <!-- DataTables Select CSS -->
+  <link href="static/css/addons/datatables.min.css" rel="stylesheet">
+</head>
+<body style="overflow: hidden;" align="center">
 
-<form action="/do_create_item" method="POST" class="pure-form">
+
+<form action="/do_create_item" method="POST" class="text-center border border-light p-5">
+    
     <fieldset class="pure-group">
-        <legend><h3>Provide information about yourself</h3></legend>
-        <input type="text" class="pure-input-1-2" placeholder="Enter your name" name="name">
-        <input type="email" class="pure-input-1-2" placeholder="Enter your email address" name="emailaddress">
-        <input type="text" class="pure-input-1-2" placeholder="Provide your cellphone number" name="cellphone">
+        <legend><h3>Dina kontaktuppgifter</h3></legend>
+        <input type="text" class="form-control mb-4" placeholder="Namn" name="name"required>
+        <input type="email" class="form-control mb-4" placeholder="E-post" name="emailaddress"required>
+        <input type="text" class="form-control mb-4" placeholder="Telefon" name="cellphone"required>
     </fieldset>
 
     <fieldset class="pure-group">
-        <legend><h3>Bare minimum of details to create a new idea/proposal</h3></legend>
-        <input type="text" class="pure-input-1-2" placeholder="Give your idea a name" name="itemname">
-        <textarea class="pure-input-1-2" placeholder="Provide a description about your idea" name="itemdescr"></textarea>
+        <legend><h3>Ditt förslag</h3></legend>
+        <input type="text" class="form-control mb-4" placeholder="Namn på idé / förslag" name="itemname"required>
+        <textarea class="form-control mb-4" rows="5" placeholder="Beskrivning av ditt förslag" name="itemdescr" required></textarea>
     </fieldset>
 
     <fieldset class="pure-group">
-        <legend><h3>Adding answers below increase your chances significantly (optional)</h3></legend>
-        <textarea class="pure-input-1-2" placeholder="What is the problem this idea solves?" name="itemsolves"></textarea>
-        <textarea class="pure-input-1-2" placeholder="What result will it bring?" name="itemresults"></textarea>
+        <legend><h3>Besvara dessa frågor (frivilligt) </h3></legend>
+        <textarea class="form-control mb-4" rows="4" placeholder="Vilket problem löser ditt förslag?" name="itemsolves"></textarea>
+        <textarea class="form-control mb-4" rows="4" placeholder="Vad blir resultatet av ditt förslag?" name="itemresults"></textarea>
     </fieldset>
     <br>
-    <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Submit</button>
+    <button id ="myBtn" type="submit" class="btn btn-info btn-block">Skicka</button>
 </form>
 
+<script>
+  var textarea = document.querySelector('textarea');
+
+textarea.addEventListener('keydown', autosize);
+             
+function autosize(){
+  var el = this;
+  setTimeout(function(){
+    el.style.cssText = 'height:auto; padding:0';
+    // for box-sizing other than "content-box" use:
+    // el.style.cssText = '-moz-box-sizing:content-box';
+    el.style.cssText = 'height:' + el.scrollHeight + 'px';
+  },0);
+}
+   //This is the first load of is valid, just in case the user gets back again with old inputs
+   //if all the required inputs are filled enable the button
+   var isValid = true;
+     $('input,textarea,select').filter('[required]:visible').each(function() {
+      if ( $(this).val() === '' )
+         isValid = false;
+    });
+    if( isValid ) {
+       $('#myBtn').prop('disabled', false);
+    } else {
+       $('#myBtn').prop('disabled', true);
+    };
+    $('#myBtn').click(function() {
+        var isValid = true;
+         $('input,textarea,select').filter('[required]:visible').each(function() {
+          if ( $(this).val() === '' )
+             isValid = false;
+        });
+        if( isValid ) {
+           $("/do_create_item")[0].submit(); 
+       };
+
+    });
+    
+    //When a input is changed check all the inputs and if all are filled, enable the button
+     $('input,textarea,select').change(function() {
+        var isValid = true;
+         $('input,textarea,select').filter('[required]:visible').each(function() {
+          if ( $(this).val() === '' )
+             isValid = false;
+        });
+        if( isValid ) {
+           $('#myBtn').prop('disabled', false);
+        } else {
+           $('#myBtn').prop('disabled', true);
+        };
+    });
+    
+    //In case the user edits the button with firebug and removes disabled, check
+    $('#myBtn').click(function() {
+         var isValid = true;
+         $('input,textarea,select').filter('[required]:visible').each(function() {
+          if ( $(this).val() === '' )
+             isValid = false;
+        });
+        if( isValid ) {
+           $("/do_create_item")[0].submit(); 
+       };
+    });
+
+</script>
+
+ <script type="text/javascript" src="static/js/jquery-3.3.1.min.js"></script>
+  <!-- Bootstrap tooltips -->
+  <script type="text/javascript" src="static/js/popper.min.js"></script>
+  <!-- Bootstrap core JavaScript -->
+  <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="static/js/mdb.js"></script>
+
+  <!-- DataTables Select CSS -->
+  <!-- MDBootstrap Datatables  -->
+<script type="text/javascript" src="static/js/addons/datatables.min.js"></script>
+
+</body>
+</html>

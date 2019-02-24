@@ -848,7 +848,7 @@ this the same font stack that Normalize.css sets for the `body`.
 .pure-button-selected,
 a.pure-button-primary,
 a.pure-button-selected {
-    background-color: rgb(0, 120, 231);
+    background-color: rgb(50, 120, 231);
     color: #fff;
 }
 
@@ -1031,8 +1031,10 @@ since IE8 won't execute CSS that contains a CSS3 selector.
     margin: 0;
     padding: 0.35em 0 0.75em;
     border: 0;
+    text-align: center
 }
 .pure-form legend {
+    
     display: block;
     width: 100%;
     padding: 0.3em 0;
@@ -1111,6 +1113,7 @@ since IE8 won't execute CSS that contains a CSS3 selector.
 /* Grouped Inputs */
 .pure-form .pure-group fieldset {
     margin-bottom: 10px;
+    align-items: center
 }
 .pure-form .pure-group input,
 .pure-form .pure-group textarea {
@@ -1120,6 +1123,7 @@ since IE8 won't execute CSS that contains a CSS3 selector.
     border-radius: 0;
     position: relative;
     top: -1px;
+    align-items: center
 }
 .pure-form .pure-group input:focus,
 .pure-form .pure-group textarea:focus {
@@ -1184,7 +1188,7 @@ since IE8 won't execute CSS that contains a CSS3 selector.
     font-size: 0.875em;
 }
 
-@media only screen and (max-width : 480px) {
+@media only screen and (max-width : 300px) {
     .pure-form button[type="submit"] {
         margin: 0.7em 0 0;
     }
@@ -1246,6 +1250,9 @@ since IE8 won't execute CSS that contains a CSS3 selector.
         font-size: 0.75em;
         /* Increased bottom padding to make it group with its related input element. */
         padding: 0.2em 0 0.8em;
+    }
+    .pure-table {
+      background-color: red;
     }
 }
 
