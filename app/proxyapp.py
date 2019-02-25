@@ -199,6 +199,7 @@ def create_item():
     if appclient.isconnected():
         return render_template('create_item.html')
     else:
+        appclient.login(manual=False)
         return redirect(url_for('proxyapp.status'))
 
 
