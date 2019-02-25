@@ -16,4 +16,5 @@ Run with Docker
 - mkdir /cert
 - Create openssl cert inside /cert, name them localhost.key and localhost.crt
 - docker image -t viima-proxy .
-- docker run -p 4000:4000 viima-proxy
+- docker run -p 4000:4000 viima-proxy (runs in foreground, perfect for debugging)
+- or docker run -d -p 4000:4000 viima-proxy (to run in detached mode)
