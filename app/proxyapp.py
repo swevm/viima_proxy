@@ -30,27 +30,27 @@ scope = [
 appclient = Viimawrapper(customer_id, authorization_base_url, api_base_url)
 
 translate_map = {
-    'name': 'Namn på Idé',
-    'created': 'Skapad  ',
-    'hotness': 'hotness',
+    'name': 'Namn på idé',
+    'fullname': 'Skapad',
+    'hotness': 'Aktivitsnivå',
     'vote_count': 'Röster',
-    'viima_score': 'Poäng',
+    'viima_score': 'AU poäng',
     'au_status': 'Status',
     'description': 'Beskrivning',
 }
 def send_data_to_portal(dataBody):
-
     URL = '*********'
     header = {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            }
-    
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    }
+
     body = dataBody
-    
+
     r = requests.post(URL, headers=header, data=json.dumps(body))
     time.sleep(0.5)
     print(r)
+
 
 proxyapp = Blueprint('proxyapp', __name__)
 
@@ -64,11 +64,10 @@ def home():
         return redirect(url_for('proxyapp.auth'))
 
 
-
 @proxyapp.route('/auth')
 def auth():
     if appclient.isconnected():
-        return redirect(url_for('proxyapp.items'))
+        return 'Connected to Viima API!  <a href=" /logout">Logout</a>'
     else:
         return render_template('auth.html')
 
@@ -83,7 +82,7 @@ def do_auth():
                         request.form['client_id'],
                         request.form['client_secret'],
                         scope=scope)
-    
+
         return redirect(url_for('proxyapp.table'))
     else:
         appclient.login(manual=False)
@@ -92,9 +91,9 @@ def do_auth():
 
 @proxyapp.route("/items")
 def items():
-    
+
     if appclient.isconnected():
-        
+
         items = appclient.getitems()
         statuses = appclient.getstatuses()
         response_item = {}
@@ -116,11 +115,12 @@ def items():
             response_items.append(response_item)
             #send_data_to_portal(response_item)
             response_item = {}
-            
+
         return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
         appclient.login(manual=False)
         return redirect(url_for('proxyapp.items'))
+
 
 @proxyapp.route('/status')
 def status():
@@ -130,6 +130,7 @@ def status():
     else:
         return render_template('status.html', is_connected=appclient.isconnected())
 
+
 @proxyapp.route('/thanks')
 def thanks():
     # Show connection status for backend API
@@ -137,6 +138,8 @@ def thanks():
         return render_template('thanks.html', is_connected=appclient.isconnected()) #redirect(url_for('proxyapp.items'))  # Add dynamic data to status to show that connecvtion is live or down.
     else:
         return render_template('status.html', is_connected=appclient.isconnected())
+
+
 @proxyapp.route("/table")
 def table():
     if appclient.isconnected():
@@ -156,10 +159,17 @@ def table():
         #
         for local_item in items['results']:
             response_item['name'] = local_item['name']
-            response_item['created'] = local_item['created'].replace("T"," ").split(".")[0]
+            response_item['fullname'] = local_item['fullname']
             response_item['hotness'] = round(float(local_item['hotness']), 1)
-            response_item['vote_count'] = local_item['vote_count']
-            response_item['viima_score'] = local_item['viima_score']
+            if local_item['vote_count'] is None:
+                response_item['vote_count'] = 0
+            else:
+                response_item['vote_count'] = local_item['vote_count']
+            if local_item['viima_score'] is None:
+                response_item['viima_score'] = 0
+            else:
+                response_item['viima_score'] = round(float(local_item['viima_score']), 1)
+            #response_item['viima_score'] = local_item['viima_score']
             #description['description'] = local_item['description']
             #description['name'] = local_item['name']
 
@@ -190,8 +200,10 @@ def table():
 
         return render_template('table.html', records=response_items, colnames=labels, friendlycols=friendlylabels)
     else:
-        appclient.login(manual=False)
-        return redirect(url_for('proxyapp.table'))
+        if appclient.login(manual=False) == 1:
+            return redirect(url_for('proxyapp.table'))
+        else:
+            return redirect(url_for('proxyapp.status'))
 
 
 @proxyapp.route('/create_item')
@@ -199,7 +211,6 @@ def create_item():
     if appclient.isconnected():
         return render_template('create_item.html')
     else:
-        appclient.login(manual=False)
         return redirect(url_for('proxyapp.status'))
 
 

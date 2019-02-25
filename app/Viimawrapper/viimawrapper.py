@@ -2,10 +2,13 @@ from oauthlib.oauth2 import LegacyApplicationClient
 from requests_oauthlib import OAuth2Session
 import json
 import logging
+import time
 import base64
 import requests
 mySession = {}
 newSess = {}
+
+
 class Viimawrapper:
     """
         Viimawrapper class is a CRUD wrapper for public Viima REST API that wrap the basic api features in Python methods
@@ -54,7 +57,7 @@ class Viimawrapper:
         self.sess = {}
         self.ref_token = None
         # Create Oauth2Session - perhaps have these utility functions in a separate method instead of __init__
-        # I wondr if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
+        # I wonder if this really work defining the session here. What is the difference between client=LegacyApplicationClient and just passing in client_id as done in get, post etc????
         self.viimaAppClient = None
 
         self.api_connection_state = False  # True if class har working connection to Viima API
@@ -62,7 +65,7 @@ class Viimawrapper:
 
     def connect(self, username, password):
         pass
-        
+
     def writeSession(self, sess):
         encoded_session = base64.b64encode(bytes(json.dumps(self.sess) ,'utf-8'))
         txt = open("binary.sn","wb")
@@ -70,21 +73,23 @@ class Viimawrapper:
         txt.close()
 
     def readSession(self):
-        try: 
+        try:
             data = open("binary.sn", "r").read()
             decoded = base64.b64decode(data)
             decoded = decoded.decode()
             session = json.loads(decoded)
         except:
-            session = {}    
+            session = {}
             #print(session)
         return session
+
     def isconnected(self):
         """
                 Returns
                 -------
                 Boolean - True for connected to Viima API otherwise false
         """
+        self.logger.debug('isconnected() = {} '.format(self.api_connection_state))
         return self.api_connection_state
 
     def token_updater(self, token):
@@ -100,16 +105,14 @@ class Viimawrapper:
             return self.token
         else:
             return False
-    def send_data_to_portal(self, dataBody):
 
+    def send_data_to_portal(self, dataBody):
         URL = '******************'
         header = {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                }
-        
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
         body = dataBody
-     
         r = requests.post(URL, headers=header, data=json.dumps(body))
         time.sleep(0.5)
         print(r)
@@ -124,13 +127,13 @@ class Viimawrapper:
                 self.ref_token = mySession['ouath_token']['refresh_token']
                 payload = {'client_id': self.client_id, 'client_secret' : self.client_secret, 'grant_type': 'refresh_token', 'refresh_token': self.ref_token}
                 Header = {
-                         "Content-Type" : "application/x-www-form-urlencoded" 
+                         "Content-Type" : "application/x-www-form-urlencoded"
                 }
                 #Refresh Token
                 r = requests.post("https://app.viima.com/oauth2/token/", data = payload, headers=Header)
 
                 # Save New Token
-                self.token = r.json() 
+                self.token = r.json()
                 self.sess['client_id'] = self.client_id
                 self.sess['client_secret'] = self.client_secret
                 self.sess['ouath_token'] = self.token
@@ -142,8 +145,8 @@ class Viimawrapper:
                 print("Exception in login: %s", e)
                 self.logger.error("Please log in")
                 self.api_connection_state = False
-                return -1    
-        else: 
+                return -1
+        else:
             #Manual login
             self.client_id = client_id
             self.client_secret = client_secret
@@ -191,7 +194,6 @@ class Viimawrapper:
             self.client = OAuth2Session(self.client_id,
                                         token=self.token,
                                         auto_refresh_kwargs=self.extras,
-                                        #auto_refresh_url=self.authorization_url,
                                         token_updater=self.token_updater)
 
             #print(self.client)
