@@ -5,6 +5,10 @@ import sys
 from app.Viimawrapper.viimawrapper import Viimawrapper
 import requests
 import time
+
+import c3pyo as c3
+from collections import Counter
+
 # Move configuration parameters to factory - Add a config.py and import from app.config.from_mapping()???
 client_id = ""
 client_secret = ""
@@ -38,6 +42,8 @@ translate_map = {
     'au_status': 'Status',
     'description': 'Beskrivning',
 }
+
+
 def send_data_to_portal(dataBody):
     URL = '*********'
     header = {
@@ -52,6 +58,7 @@ def send_data_to_portal(dataBody):
     print(r)
 
 
+status_counter_cache = []  # Holds a list of idea statuses - used to create a dynamic chart
 proxyapp = Blueprint('proxyapp', __name__)
 
 
@@ -63,6 +70,24 @@ def home():
     else:
         return redirect(url_for('proxyapp.auth'))
 
+
+def get_bar_chart_au_status_json():
+    labels = Counter(status_counter_cache).keys()
+    values = Counter(status_counter_cache).values()
+    au_state_count = values
+
+    chart = c3.BarChart()
+    chart.plot(au_state_count, label='AU process stage')
+    chart.set_xticklabels(labels)
+    chart.ylabel('Amount')
+    chart.bind_to('bar_chart_div')
+    return chart.json()
+
+
+@proxyapp.route("/au_process_stage_chart", methods=['GET', 'POST'])
+def au_process_stage_chart():
+    chart_json = get_bar_chart_au_status_json()
+    return render_template("barchart.html", chart_json=chart_json)
 
 @proxyapp.route('/auth')
 def auth():
@@ -111,11 +136,11 @@ def items():
             for status in statuses:
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
+                    status_counter_cache.append(status['name']) # Create list of AU Status as base for barchart
                     break
             response_items.append(response_item)
             #send_data_to_portal(response_item)
             response_item = {}
-
         return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
         appclient.login(manual=False)
