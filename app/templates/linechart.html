@@ -1,18 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+<div class="container">
+    <!--Grid row-->
+  <div class="row d-flex justify-content-center mt-5">
 
-<head>
-  <title>HSEP Simulator Analysis</title>
-  <link rel="stylesheet" href="/static/css/c3.min.css">
-  <script src="/static/js/c3.min.js"></script>
-  <script src="/static/js/d3.min.js"></script>
-</head>
+    <!--Grid column-->
+    <div class="col-md-10">
 
-<body>
-  <div id='line_chart_div'></div>
-    <script type="text/javascript">
-        c3.generate({{chart_json|safe}})
-    </script>
-</body>
+      <canvas id="lineChart"></canvas>
 
-</html>
+    </div>
+    <!--Grid column-->
+
+  </div>
+  <!--Grid row-->
+</div>
