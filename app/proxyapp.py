@@ -83,7 +83,7 @@ def get_bar_chart_au_status_json():
     chart.bind_to('bar_chart_div')
     return chart.json()
 
-
+#hur många ideer som befinner sig i AU processer
 @proxyapp.route("/au_process_stage_chart", methods=['GET', 'POST'])
 def au_process_stage_chart():
     chart_json = get_bar_chart_au_status_json()
@@ -116,7 +116,7 @@ def do_auth():
 
 @proxyapp.route("/items")
 def items():
-
+    #cashetools
     if appclient.isconnected():
 
         items = appclient.getitems()
