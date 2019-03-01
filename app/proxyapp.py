@@ -103,6 +103,12 @@ def line_chart_test():
     else:
         return render_template('status.html')
 
+@proxyapp.route('/barchart')
+def bar_chart_test():
+    if appclient.isconnected():
+        return render_template('bar_chart_test.html')
+    else:
+        return render_template('status.html')
 
 @proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
@@ -144,7 +150,7 @@ def items():
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
                     status_counter_cache.append(status['name']) # Create list of AU Status as base for barchart
-                    print(response_item)
+                    print(response_item['name'])
                     break
             response_items.append(response_item)
             #send_data_to_portal(response_item)
