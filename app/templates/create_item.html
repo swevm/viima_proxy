@@ -12,14 +12,16 @@
   <!-- Material Design Bootstrap -->
   <link href="static/css/mdb.min.css" rel="stylesheet">
   <!-- Your custom styles (optional) -->
+   <link href="static/css/style.css" rel="stylesheet">
   <!-- DataTables Select CSS -->
   <link href="static/css/addons/datatables.min.css" rel="stylesheet">
+ 
 </head>
 <body align="center">
-
-
+<div class="bg-img">
 <form action="/do_create_item" method="POST" class="text-center border border-light p-5">
     
+
     <fieldset class="pure-group">
         <legend><h3>Dina kontaktuppgifter</h3></legend>
         <input type="text" class="form-control mb-4" placeholder="Namn" name="name"required>
@@ -41,7 +43,7 @@
     <br>
     <button id ="myBtn" type="submit" class="btn btn-info btn-block">Skicka</button>
 </form>
-
+</div>
 <script>
   var textarea = document.querySelector('textarea');
 
