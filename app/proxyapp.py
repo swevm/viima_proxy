@@ -169,7 +169,7 @@ def line_chart_test():
         return render_template('line_chart_test.html', labels=status_names,data=status_count)
     else:
         appclient.login(manual=False)
-        return redirect(url_for('proxyapp.items'))
+        return redirect(url_for('proxyapp.status'))
 
 @proxyapp.route('/barchart')
 def bar_chart_test():
@@ -208,7 +208,7 @@ def bar_chart_test():
         return render_template('bar_chart_test.html', labels=status_names,data=status_count)
     else:
         appclient.login(manual=False)
-        return redirect(url_for('proxyapp.items'))
+        return redirect(url_for('proxyapp.status'))
 
 @proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
@@ -260,12 +260,11 @@ def items():
             
         status_names = list(d.keys())
         status_count = list(d.values())
-        print(d)
 
-        return render_template('bar_chart_test.html', labels=status_names,data=status_count)
+        return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
     else:
         appclient.login(manual=False)
-        return redirect(url_for('proxyapp.items'))
+        return redirect(url_for('proxyapp.status'))
 
 
 @proxyapp.route('/status')
