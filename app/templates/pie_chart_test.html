@@ -42,18 +42,27 @@
   console.log(myData)
   
   var myBarChart = new Chart(ctxB, {
-    type: 'line',
+    type: 'pie',
     data: {
       labels: myLabels,
       datasets: [{
         label: '# of Votes',
         data: myData,
         backgroundColor: [
-          'rgba(108,172,32, 0.4)'
-        
+          'rgba(247,228,102, 0.4)',
+          'rgba(240,118,118, 0.4)',
+          'rgba(90,198,255, 0.4)',
+          'rgba(198,101,219, 0.4)',
+          'rgba(168,16,199, 0.4)',
+          'rgba(122,137,222, 0.4)'
         ],
         borderColor: [
-          'rgba(108,172,32,1)',
+          'rgba(247,228,102,1)',
+          'rgba(240,118,118, 1)',
+          'rgba(90,198,255, 1)',
+          'rgba(198,101,219, 1)',
+          'rgba(168,16,199, 1)',
+          'rgba(122,137,222, 1)'
         ],
         borderWidth: 1
       }]
@@ -66,7 +75,7 @@
         position: 'left'
       },
       legend:{
-        display: false,
+        display: true,
         position: 'right',
         labels: {
           fontSize : 20,

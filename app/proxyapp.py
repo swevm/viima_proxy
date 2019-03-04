@@ -96,19 +96,119 @@ def auth():
     else:
         return render_template('auth.html')
 
+@proxyapp.route('/piechart')
+def pie_chart_test():
+    if appclient.isconnected():
+
+        items = appclient.getitems()
+        statuses = appclient.getstatuses()
+        response_item = {}
+        response_items = []
+        status_counter=[]
+        # Loop through items response. Ideas are stored in "[results]"
+        for local_item in items['results']:
+            # log.debug('Extracted idea item: %s', local_item)
+            response_item['name'] = local_item['name']
+            response_item['fullname'] = local_item['fullname']
+            response_item['hotness'] = local_item['hotness']
+            response_item['vote_count'] = local_item['vote_count']
+            response_item['viima_score'] = local_item['viima_score']
+            response_item['description'] = local_item['description']
+            for status in statuses:
+                if local_item['status'] == status['id']:
+                    response_item['au_status'] = status['name']
+                    status_counter.append(status['name']) # Create list of AU Status as base for barchart
+                    break
+            response_items.append(response_item)
+     
+            response_item = {}
+
+        i = status_counter
+        d = {x:i.count(x) for x in i}
+            
+        status_names = list(d.keys())
+        status_count = list(d.values())
+
+        return render_template('pie_chart_test.html', labels=status_names,data=status_count)
+    else:
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.items'))
 @proxyapp.route('/linechart')
 def line_chart_test():
     if appclient.isconnected():
-        return render_template('line_chart_test.html')
+
+        items = appclient.getitems()
+        statuses = appclient.getstatuses()
+        response_item = {}
+        response_items = []
+        status_counter=[]
+        # Loop through items response. Ideas are stored in "[results]"
+        for local_item in items['results']:
+            # log.debug('Extracted idea item: %s', local_item)
+            response_item['name'] = local_item['name']
+            response_item['fullname'] = local_item['fullname']
+            response_item['hotness'] = local_item['hotness']
+            response_item['vote_count'] = local_item['vote_count']
+            response_item['viima_score'] = local_item['viima_score']
+            response_item['description'] = local_item['description']
+            for status in statuses:
+                if local_item['status'] == status['id']:
+                    response_item['au_status'] = status['name']
+                    status_counter.append(status['name']) # Create list of AU Status as base for barchart
+                    break
+            response_items.append(response_item)
+     
+            response_item = {}
+
+        i = status_counter
+        d = {x:i.count(x) for x in i}
+            
+        status_names = list(d.keys())
+        status_count = list(d.values())
+
+        return render_template('line_chart_test.html', labels=status_names,data=status_count)
     else:
-        return render_template('status.html')
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.items'))
 
 @proxyapp.route('/barchart')
 def bar_chart_test():
+     #cashetools
     if appclient.isconnected():
-        return render_template('bar_chart_test.html')
+
+        items = appclient.getitems()
+        statuses = appclient.getstatuses()
+        response_item = {}
+        response_items = []
+        status_counter=[]
+        # Loop through items response. Ideas are stored in "[results]"
+        for local_item in items['results']:
+            # log.debug('Extracted idea item: %s', local_item)
+            response_item['name'] = local_item['name']
+            response_item['fullname'] = local_item['fullname']
+            response_item['hotness'] = local_item['hotness']
+            response_item['vote_count'] = local_item['vote_count']
+            response_item['viima_score'] = local_item['viima_score']
+            response_item['description'] = local_item['description']
+            for status in statuses:
+                if local_item['status'] == status['id']:
+                    response_item['au_status'] = status['name']
+                    status_counter.append(status['name']) # Create list of AU Status as base for barchart
+                    break
+            response_items.append(response_item)
+          
+            response_item = {}
+            #Create a dict for counting values for every key.
+        i = status_counter
+        d = {x:i.count(x) for x in i}
+            
+        status_names = list(d.keys())
+        status_count = list(d.values())
+
+        return render_template('bar_chart_test.html', labels=status_names,data=status_count)
     else:
-        return render_template('status.html')
+        appclient.login(manual=False)
+        return redirect(url_for('proxyapp.items'))
 
 @proxyapp.route('/do_auth', methods=['POST'])
 def do_auth():
@@ -136,7 +236,7 @@ def items():
         statuses = appclient.getstatuses()
         response_item = {}
         response_items = []
-
+        status_counter=[]
         # Loop through items response. Ideas are stored in "[results]"
         for local_item in items['results']:
             # log.debug('Extracted idea item: %s', local_item)
@@ -149,13 +249,20 @@ def items():
             for status in statuses:
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
-                    status_counter_cache.append(status['name']) # Create list of AU Status as base for barchart
-                    print(response_item['name'])
+                    status_counter.append(status['name']) # Create list of AU Status as base for barchart
                     break
             response_items.append(response_item)
             #send_data_to_portal(response_item)
             response_item = {}
-        return Response(json.dumps(response_items), mimetype='application/json', content_type='text/json; charset=utf-8')
+            #Create a dict for counting values for every key.
+        i = status_counter
+        d = {x:i.count(x) for x in i}
+            
+        status_names = list(d.keys())
+        status_count = list(d.values())
+        print(d)
+
+        return render_template('bar_chart_test.html', labels=status_names,data=status_count)
     else:
         appclient.login(manual=False)
         return redirect(url_for('proxyapp.items'))

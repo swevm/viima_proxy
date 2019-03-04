@@ -37,33 +37,50 @@
  <script>
   //bar
   var ctxB = document.getElementById("barChart").getContext('2d');
+  var myData = {{data|tojson}}
+  var myLabels = {{labels|tojson}}
+  console.log(myData)
+  
   var myBarChart = new Chart(ctxB, {
     type: 'bar',
     data: {
-      labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+      labels: myLabels,
       datasets: [{
         label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
+        data: myData,
         backgroundColor: [
-          'rgba(255, 99, 132, 0.4)',
-          'rgba(54, 162, 235, 0.4)',
-          'rgba(255, 206, 86, 0.4)',
-          'rgba(75, 192, 192, 0.4)',
-          'rgba(153, 102, 255, 0.4)',
-          'rgba(255, 159, 64, 0.4)'
+          'rgba(247,228,102, 0.4)',
+          'rgba(240,118,118, 0.4)',
+          'rgba(90,198,255, 0.4)',
+          'rgba(198,101,219, 0.4)',
+          'rgba(168,16,199, 0.4)',
+          'rgba(122,137,222, 0.4)'
         ],
         borderColor: [
-          'rgba(255,99,132,1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)'
+          'rgba(247,228,102,1)',
+          'rgba(240,118,118, 1)',
+          'rgba(90,198,255, 1)',
+          'rgba(198,101,219, 1)',
+          'rgba(168,16,199, 1)',
+          'rgba(122,137,222, 1)'
         ],
         borderWidth: 1
       }]
     },
     options: {
+      title: {
+        display: true,
+        fontSize: 40,
+        text : 'Röster per status',
+        position: 'left'
+      },
+      legend:{
+        display: false,
+        position: 'right',
+        labels: {
+          fontSize : 20,
+        }
+      },
       scales: {
         yAxes: [{
           ticks: {
