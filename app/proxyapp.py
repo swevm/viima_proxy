@@ -117,7 +117,7 @@ def pie_chart_test():
             for status in statuses:
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
-                    status_counter.append(status['name']) # Create list of AU Status as base for barchart
+                    status_counter_cache.append(status['name'])  # Create list of AU Status as base for barchart
                     break
             response_items.append(response_item)
      
@@ -250,6 +250,7 @@ def items():
                 if local_item['status'] == status['id']:
                     response_item['au_status'] = status['name']
                     status_counter.append(status['name']) # Create list of AU Status as base for barchart
+                    status_counter_cache.append(status['name'])  # Create list of AU Status as base for barchart
                     break
             response_items.append(response_item)
             #send_data_to_portal(response_item)
